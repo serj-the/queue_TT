@@ -25,9 +25,9 @@ def profile():
                          active_tab='profile',
                          user=tg_user)
 
-@app.route('/duels')
+@app.route('/queue')
 def duels():
-    return render_template('duels.html', active_tab='duels')
+    return render_template('queue.html', active_tab='queue')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
