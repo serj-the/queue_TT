@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Карта кортов{% endblock %}
+
+{% block content %}
+<div class="map-container">
+    <div class="filters">
+        <select id="court-filter">
+            <option value="all">Все корты</option>
+            <option value="free">Свободные</option>
+        </select>
+    </div>
+    
+    <div id="map" class="map-placeholder">
+        <!-- Здесь будет 2GIS карта -->
+        <p>Карта загружается...</p>
+    </div>
+</div>
+{% endblock %}
