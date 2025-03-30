@@ -1,26 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Инициализация Telegram WebApp
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.expand();
-        Telegram.WebApp.enableClosingConfirmation();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.expand();
+        tg.enableClosingConfirmation();
         
         // Можно использовать данные пользователя
-        const user = Telegram.WebApp.initDataUnsafe.user;
+        const user = tg.initDataUnsafe.user;
         console.log('User:', user);
+        
+        // Добавляем ID пользователя во все запросы
+        document.body.dataset.userId = user?.id;
     }
     
-    // Здесь будет инициализация карты
-    initMap();
+    // Инициализация карты (если на странице есть карта)
+    if (document.getElementById('map')) {
+        initMap();
+    }
 });
 
 function initMap() {
     // Заглушка для будущей интеграции с 2GIS
     console.log('Инициализация карты...');
-    
-    // Пример: можно добавить кнопку для теста
-    const testButton = document.createElement('button');
-    testButton.textContent = 'Тест карты';
-    testButton.className = 'tg-button';
-    testButton.onclick = () => alert('Карта будет здесь!');
-    document.getElementById('map').append(testButton);
 }
