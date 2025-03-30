@@ -56,6 +56,14 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    {% block scripts %}{% endblock %}
+
+    {% block scripts %}
+    
+{% if active_tab == 'profile' %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endif %}
+    
+{% endblock %}
+
 </body>
 </html>
