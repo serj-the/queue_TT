@@ -23,3 +23,18 @@ function initMap() {
     // Заглушка для будущей интеграции с 2GIS
     console.log('Инициализация карты...');
 }
+
+function adjustForIOS() {
+    if (/iPhone/.test(navigator.userAgent)) {
+        const doc = document.documentElement;
+        doc.style.setProperty('--safe-area-inset-bottom', '20px');
+        
+        // Дополнительная проверка для новых iPhone
+        if (window.screen.height >= 812) {
+            doc.style.setProperty('--nav-height', '72px');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', adjustForIOS);
+window.addEventListener('resize', adjustForIOS);
