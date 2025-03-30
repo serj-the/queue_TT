@@ -13,6 +13,37 @@ queues = {
     ]
 }
 
+@app.route('/profile')
+def profile():
+    tg_user = {
+        'id': 335261856,
+        'name': "Алексей Теннисов",
+        'rating': 1520,
+        'matches': 27,
+        'wins': 18,
+        'photo_url': "https://via.placeholder.com/150",
+        'last_games': [
+            {"opponent": "Иван И.", "result": "6:4", "date": "01.05.2023"},
+            {"opponent": "Мария С.", "result": "3:6", "date": "28.04.2023"}
+        ]
+    }
+    return render_template('profile.html', 
+                         active_tab='profile',
+                         user=tg_user)
+
+@app.route('/rating')
+def rating():
+    players = [
+        {"id": 1, "name": "Сергей Ч.", "rating": 1820, "city": "Москва"},
+        {"id": 2, "name": "Анна К.", "rating": 1750, "city": "Санкт-Петербург"},
+        {"id": 335261856, "name": "Алексей Т.", "rating": 1520, "city": "Москва"},
+        {"id": 4, "name": "Дмитрий П.", "rating": 1480, "city": "Казань"}
+    ]
+    return render_template('rating.html',
+                         active_tab='rating',
+                         players=players,
+                         current_user_id=335261856)
+
 @app.route('/')
 def home():
     return render_template('map.html', active_tab='map')
