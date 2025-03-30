@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Courts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>🎾 {% block title %}{% endblock %}</h1>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <nav class="tabs">
+            <a href="/map" class="tab {% if active_tab == 'map' %}active{% endif %}">
+                <span>Карта</span>
+            </a>
+            <a href="/rating" class="tab {% if active_tab == 'rating' %}active{% endif %}">
+                <span>Рейтинг</span>
+            </a>
+            <a href="/profile" class="tab {% if active_tab == 'profile' %}active{% endif %}">
+                <span>Профиль</span>
+            </a>
+            <a href="/duels" class="tab {% if active_tab == 'duels' %}active{% endif %}">
+                <span>Дуэли</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
