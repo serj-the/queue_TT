@@ -1,33 +1,26 @@
-from flask import Flask, render_template
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return render_template('map.html', active_tab='map')
-
-@app.route('/map')
-def map_page():
-    return render_template('map.html', active_tab='map')
-
-@app.route('/rating')
-def rating():
-    return render_template('rating.html', active_tab='rating')
-
-@app.route('/profile')
-def profile():
-    tg_user = {
-        'name': "Тестовый Пользователь",
-        'rating': 1200,
-        'matches': 15
+document.addEventListener('DOMContentLoaded', () => {
+    // Инициализация Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.expand();
+        Telegram.WebApp.enableClosingConfirmation();
+        
+        // Можно использовать данные пользователя
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        console.log('User:', user);
     }
-    return render_template('profile.html', 
-                         active_tab='profile',
-                         user=tg_user)
+    
+    // Здесь будет инициализация карты
+    initMap();
+});
 
-@app.route('/duels')
-def duels():
-    return render_template('duels.html', active_tab='duels')
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+function initMap() {
+    // Заглушка для будущей интеграции с 2GIS
+    console.log('Инициализация карты...');
+    
+    // Пример: можно добавить кнопку для теста
+    const testButton = document.createElement('button');
+    testButton.textContent = 'Тест карты';
+    testButton.className = 'tg-button';
+    testButton.onclick = () => alert('Карта будет здесь!');
+    document.getElementById('map').append(testButton);
+}
