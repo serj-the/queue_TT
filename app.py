@@ -29,25 +29,15 @@ def rating_page():  # Изменили имя функции
 
 @app.route('/map')
 def map_page():
-    # Тестовые данные кортов
-    courts = [
-        {"id": "central", "name": "Центральный корт", "coords": [55.751574, 37.573856]},
-        {"id": "north", "name": "Северный корт", "coords": [55.761574, 37.573856]}
-    ]
     return render_template('map.html', 
                          active_tab='map',
-                         courts=courts)
+                         courts=get_courts())  # Ваша функция получения кортов
 
-@app.route('/api/court/<court_id>')
-def get_court(court_id):
-    # Заглушка данных корта
-    court = {
-        "id": court_id,
-        "name": f"Корт {court_id}",
-        "queue": [],
-        "rating": 4.5
-    }
-    return jsonify(court)
+def get_courts():
+    return [
+        {"id": 1, "name": "Центральный корт", "lat": 55.751574, "lng": 37.573856},
+        {"id": 2, "name": "Северный корт", "lat": 55.761574, "lng": 37.573856}
+    ]
 
 @app.route('/profile')
 def profile():
