@@ -19,9 +19,6 @@ players_rating = [
 def home():
     return render_template('map.html', active_tab='map')
 
-@app.route('/map')
-def map_page():
-    return render_template('map.html', active_tab='map')
 
 @app.route('/rating')
 def rating_page():  # Изменили имя функции
@@ -29,6 +26,28 @@ def rating_page():  # Изменили имя функции
                          active_tab='rating',
                          players=players_rating,
                          current_user_id=335261856)
+
+@app.route('/map')
+def map_page():
+    # Тестовые данные кортов
+    courts = [
+        {"id": "central", "name": "Центральный корт", "coords": [55.751574, 37.573856]},
+        {"id": "north", "name": "Северный корт", "coords": [55.761574, 37.573856]}
+    ]
+    return render_template('map.html', 
+                         active_tab='map',
+                         courts=courts)
+
+@app.route('/api/court/<court_id>')
+def get_court(court_id):
+    # Заглушка данных корта
+    court = {
+        "id": court_id,
+        "name": f"Корт {court_id}",
+        "queue": [],
+        "rating": 4.5
+    }
+    return jsonify(court)
 
 @app.route('/profile')
 def profile():
