@@ -7,17 +7,29 @@ class TennisApp {
     }
 
     init() {
-        // Инициализация Telegram WebApp
-        Telegram.WebApp.expand();
-        Telegram.WebApp.enableClosingConfirmation();
+        // Проверяем наличие Telegram WebApp API
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.expand();
+            Telegram.WebApp.enableClosingConfirmation();
+        } else {
+            console.log('Running outside Telegram environment');
+        }
         
-        // Обработчик вкладок
+        // Улучшенный обработчик вкладок
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchTab(tab.dataset.tab);
+            });
         });
         
-        // Первоначальная загрузка
-        this.loadTabContent();
+        // Первоначальная загрузка с обработкой ошибок
+        try {
+            this.loadTabContent();
+        } catch (e) {
+            console.error('Initial load error:', e);
+            this.showError();
+        }
     }
 
     switchTab(tabName) {
@@ -29,6 +41,9 @@ class TennisApp {
     }
 
     loadTabContent() {
+        // Очищаем контент перед загрузкой нового
+        this.tabContent.innerHTML = '';
+        
         switch (this.currentTab) {
             case 'map':
                 this.renderMap();
@@ -43,22 +58,31 @@ class TennisApp {
     }
 
     renderMap() {
-        this.tabContent.innerHTML = `
-            <div class="map-container">
-                <iframe 
-                    src="https://yandex.ru/map-widget/v1/?um=constructor%3A364c361b98ec98810672f3b77dfe80b8487de7eac5cd0f7d7b694e1b883f34e4&amp;source=constructor"
-                    frameborder="0"
-                    class="yandex-map"
-                    allowfullscreen
-                ></iframe>
-            </div>
-        `;
+        // Добавляем лоадер перед загрузкой карты
+        this.tabContent.innerHTML = '<div class="loader">Загрузка карты...</div>';
         
-        // Блокируем скролл страницы
-        const iframe = document.querySelector('.yandex-map');
-        iframe.addEventListener('load', () => {
-            iframe.contentWindow.document.body.style.overflow = 'hidden';
-        });
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://yandex.ru/map-widget/v1/?um=constructor%3A364c361b98ec98810672f3b77dfe80b8487de7eac5cd0f7d7b694e1b883f34e4&amp;source=constructor';
+        iframe.className = 'yandex-map';
+        iframe.frameBorder = '0';
+        iframe.allowFullscreen = true;
+        
+        // Обработчики для iframe
+        iframe.onload = () => {
+            try {
+                iframe.contentWindow.document.body.style.overflow = 'hidden';
+            } catch (e) {
+                console.log('Could not access iframe content:', e);
+            }
+        };
+        
+        iframe.onerror = () => {
+            this.tabContent.innerHTML = '<div class="error">Не удалось загрузить карту. Проверьте подключение к интернету.</div>';
+        };
+        
+        // Заменяем лоадер на iframe
+        this.tabContent.innerHTML = '';
+        this.tabContent.appendChild(iframe);
     }
 
     renderQueue() {
@@ -75,10 +99,15 @@ class TennisApp {
                 </div>
             </div>
         `;
+        
+        // Добавляем обработчик кнопки
+        document.querySelector('.join-btn')?.addEventListener('click', () => {
+            alert('Функция "Встать в очередь" будет доступна в следующей версии');
+        });
     }
 
     renderProfile() {
-        const user = Telegram.WebApp.initDataUnsafe.user || {};
+        const user = window.Telegram?.WebApp?.initDataUnsafe?.user || {};
         this.tabContent.innerHTML = `
             <div class="profile-container">
                 <div class="profile-header">
@@ -98,6 +127,17 @@ class TennisApp {
             </div>
         `;
     }
+
+    showError() {
+        this.tabContent.innerHTML = `
+            <div class="error">
+                Произошла ошибка. Пожалуйста, перезагрузите приложение.
+            </div>
+        `;
+    }
 }
 
-new TennisApp();
+// Запускаем приложение после полной загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    new TennisApp();
+});
