@@ -1,374 +1,114 @@
+/* Базовые стили Telegram WebApp */
 :root {
-    --tg-bg-color: #ffffff;
-    --tg-text-color: #000000;
-    --tg-button-color: #2eaddc;
-    --tg-hint-color: #707579;
-    --tg-secondary-bg: #f4f4f5;
-    --nav-height: 66px;
-    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --tg-bg-color: #ffffff;
+  --tg-text-color: #000000;
+  --tg-theme-bg-color: var(--tg-bg-color);
+  --tg-theme-text-color: var(--tg-text-color);
+  --tg-theme-secondary-bg-color: #f4f4f5;
+  --tg-theme-button-color: #3390ec;
+  --tg-theme-hint-color: #707579;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* Сброс и корневые элементы */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  overscroll-behavior: none; /* Блокируем pull-to-refresh */
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--tg-theme-bg-color, var(--tg-bg-color));
-    color: var(--tg-theme-text-color, var(--tg-text-color));
-    line-height: 1.5;
+/* Основной контейнер */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
-.app-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+/* Контент вкладки */
+.tab-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 
-.main-content {
-    flex: 1;
-    overflow-y: auto;
-    padding-bottom: 60px; /* Отступ для нижней панели */
+/* Нижняя навигация (как в Wallet) */
+.tabs {
+  display: flex;
+  height: 56px;
+  background: var(--tg-theme-secondary-bg-color);
+  border-top: 1px solid rgba(0,0,0,0.1);
 }
 
-.main-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    height: 60px;
-    background: var(--tg-theme-secondary-bg-color, #f8f9fa);
-    border-top: 1px solid var(--tg-theme-section-bg-color, #e9ecef);
-    z-index: 1000;
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--tg-theme-hint-color);
 }
 
-.app-header {
-    background: var(--tg-theme-secondary-bg-color, var(--tg-secondary-bg));
-    padding: 12px 15px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+.tab.active {
+  color: var(--tg-theme-button-color);
 }
 
-.header-content {
-    max-width: 1200px;
-    margin: 0 auto;
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  fill: currentColor;
 }
 
-.app-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+/* Стили для карты */
+.map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-.app-main {
-    flex: 1;
-    padding: 15px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
+.yandex-map {
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
-/* Навигация */
-.bottom-nav {
-    position: fixed;
-    bottom: var(--safe-area-inset-bottom);
-    left: 0;
-    right: 0;
-    display: flex;
-    background: var(--tg-theme-secondary-bg-color, var(--tg-secondary-bg));
-    border-top: 1px solid rgba(0,0,0,0.1);
-    height: var(--nav-height);
-    padding-bottom: var(--safe-area-inset-bottom);
-    z-index: 1000;
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+  .yandex-map {
+    filter: invert(90%) hue-rotate(180deg) contrast(85%);
+  }
 }
 
-.nav-item svg {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 4px;
-    fill: currentColor;
+/* Минимальные стили для очереди */
+.queue-container {
+  padding: 16px;
 }
 
-.nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    color: var(--tg-theme-hint-color, #6c757d);
-    font-size: 12px;
+.court-card {
+  background: var(--tg-theme-secondary-bg-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
 }
 
-.nav-item.active {
-    color: var(--tg-theme-button-color, #2eaddc);
-}
-
-.nav-icon {
-    width: 22px;
-    height: 22px;
-    fill: currentColor;
-    margin-bottom: 4px;
-}
-
-.nav-label {
-    font-size: 0.65rem;
-    margin-top: 2px;
-}
-
-/* Адаптация для Telegram */
-@media (max-height: 600px) {
-    .app-header {
-        padding: 8px 15px;
-    }
-    .app-title {
-        font-size: 1.2rem;
-    }
-}
-
-/* Стили профиля */
+/* Минимальные стили для профиля */
 .profile-container {
-    padding: 15px;
+  padding: 16px;
 }
 
 .profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.profile-photo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 15px;
-    border: 2px solid var(--tg-theme-button-color);
-}
-
-.rating-badge {
-    background: var(--tg-theme-secondary-bg-color);
-    padding: 5px 10px;
-    border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.rank {
-    font-size: 0.8em;
-    margin-left: 5px;
-    opacity: 0.8;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.stat-card {
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-.stat-label {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
-.section-title {
-    margin: 20px 0 10px;
-    font-size: 1.1em;
-}
-
-.games-list {
-    margin-bottom: 20px;
-}
-
-.game-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
-}
-
-.game-item:last-child {
-    border-bottom: none;
-}
-
-.opponent {
-    flex: 2;
-}
-
-.result {
-    flex: 1;
-    text-align: center;
-    font-weight: bold;
-}
-
-.result.win {
-    color: #4CAF50;
-}
-
-.result.lose {
-    color: #F44336;
-}
-
-.game-date {
-    flex: 1;
-    text-align: right;
-    opacity: 0.7;
-    font-size: 0.9em;
-}
-
-/* Стили рейтинга */
-.rating-container {
-    padding: 15px;
-}
-
-.tg-select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--tg-theme-secondary-bg-color);
-    background: var(--tg-theme-bg-color);
-    color: var(--tg-theme-text-color);
-    margin-bottom: 15px;
-}
-
-.players-list {
-    margin-top: 10px;
-}
-
-.player-card {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 10px;
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 10px;
-}
-
-.player-card.current-user {
-    border-left: 3px solid var(--tg-theme-button-color);
-}
-
-.player-rank {
-    font-weight: bold;
-    margin-right: 15px;
-    width: 20px;
-    text-align: center;
-}
-
-.player-info {
-    flex: 1;
-}
-
-.player-info h3 {
-    margin-bottom: 3px;
-}
-
-.player-info p {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
-.player-rating {
-    text-align: right;
-}
-
-.rating-value {
-    font-weight: bold;
-}
-
-.rating-change {
-    display: block;
-    font-size: 0.7em;
-    color: #4CAF50;
-}
-
-/* Основные стили карты */
-.map-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    touch-action: none;
-}
-
-.map-wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.yandex-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    pointer-events: auto;
-}
-
-.geo-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--tg-theme-button-color, #2eaddc);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-
-.locate-btn:active {
-    transform: scale(0.95);
-}
-
-.locate-btn svg {
-    width: 28px;
-    height: 28px;
-}
-
-/* Оптимизация для мобильных */
-@media (max-width: 600px) {
-    .map-container {
-        height: calc(100vh - 110px);
-    }
-    
-    .locate-btn {
-        width: 48px;
-        height: 48px;
-        bottom: 15px;
-        right: 15px;
-    }
-}
-
-/* Темная тема Telegram */
-@media (prefers-color-scheme: dark) {
-    .yandex-iframe {
-        filter: invert(90%) hue-rotate(180deg) contrast(85%);
-    }
-}
-
-/* iPhone X+ специфика */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-    .bottom-nav {
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
+/* Отключаем все скроллы */
+body, html, .app, .tab-content {
+  -webkit-overflow-scrolling: auto;
+  overflow: hidden;
 }
