@@ -95,7 +95,7 @@
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="app.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
         {% block scripts %}
     {% if active_tab == 'profile' %}
 <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
@@ -103,9 +103,7 @@
         {% if active_tab == 'profile' %}
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endif %}
-        {% if active_tab == 'profile' %}
-<script src="{{ url_for('static', filename='js/queue.js') }}"></script>
-{% endif %}
+
     {% endblock %}
 </body>
 </html>
