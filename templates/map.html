@@ -4,31 +4,53 @@
 {% block header_title %}Карта{% endblock %}
 
 {% block content %}
-<div class="map-container" id="map-container">
-    <!-- Контейнер для карты -->
-    <div class="map-wrapper" id="map-wrapper">
-        <iframe 
-            src="https://yandex.ru/map-widget/v1/?um=constructor%3A364c361b98ec98810672f3b77dfe80b8487de7eac5cd0f7d7b694e1b883f34e4&amp;source=constructor"
-            class="yandex-iframe"
-            frameborder="0"
-            allowfullscreen
-            aria-label="Карта теннисных кортов">
-        </iframe>
+<div class="tab-container">
+    <button class="tab" data-tab="map">Карта</button>
+    <button class="tab" data-tab="queue">Очередь</button>
+    <button class="tab" data-tab="profile">Профиль</button>
+</div>
+
+<div class="tab-content">
+    <!-- Карта -->
+    <div class="tab-panel" id="tab-map">
+        <div class="map-wrapper">
+            <iframe 
+                src="https://yandex.ru/map-widget/v1/?um=constructor%3A364c361b98ec98810672f3b77dfe80b8487de7eac5cd0f7d7b694e1b883f34e4&amp;source=constructor"
+                class="yandex-iframe"
+                frameborder="0"
+                allowfullscreen
+                aria-label="Карта теннисных кортов">
+            </iframe>
+        </div>
+        <button class="locate-btn" id="locate-btn">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+        </button>
     </div>
 
-    <!-- Кнопка геолокации -->
-    <button class="locate-btn" id="locate-btn">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>
-    </button>
+    <!-- Очередь -->
+    <div class="tab-panel" id="tab-queue" style="display: none;">
+        <div class="queue-container">Очередь на корты</div>
+    </div>
+
+    <!-- Профиль -->
+    <div class="tab-panel" id="tab-profile" style="display: none;">
+        <div class="profile-container">Профиль пользователя</div>
+    </div>
 </div>
 
 <script>
-// Блокировка скролла страницы
-document.getElementById('map-wrapper').addEventListener('touchmove', (e) => {
-    e.preventDefault(); // Блокируем скролл страницы
-}, { passive: false });
+// Вкладки
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.style.display = 'none';
+        });
+        document.getElementById(`tab-${tabName}`).style.display = 'block';
+    });
+});
 
 // Геолокация
 document.getElementById('locate-btn').addEventListener('click', () => {
