@@ -100,3 +100,44 @@ body {
     border-radius: 12px;
     text-align: center;
 }
+/* Стили для выбора корта */
+.spot-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+/* Стили для текстового поля */
+.comment-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    min-height: 80px;
+    font-size: 16px;
+    margin-top: 16px;
+}
+
+/* Адаптация под Telegram WebApp */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .container, .queue-item, .spot-select, .comment-input {
+        background-color: #2d2d2d;
+        color: #ffffff;
+    }
+    
+    .spot-select, .comment-input {
+        border-color: #444;
+    }
+    
+    .tabs {
+        background-color: #1e1e1e;
+    }
+}
