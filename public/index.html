@@ -151,69 +151,91 @@
         </div>
     </div>
 
-        <script>
-        // Конфиг Supabase
-        const SUPABASE_URL = 'https://bpjwoqsphnjroqpkutji.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwandvcXNwaG5qcm9xcGt1dGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2ODEwNzQsImV4cCI6MjA1OTI1NzA3NH0.hW7mKqGmXG0nTeBxjgHMhVVqaE2AFcC-kPnGAp_IceM';
-        
-        // Инициализация
-        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.tab');
-            const contents = document.querySelectorAll('.content');
-            
-            // Функция для переключения вкладок
-            function switchTab(tabName) {
-                // Обновляем активное состояние вкладок
-                tabs.forEach(tab => {
-                    if (tab.dataset.tab === tabName) {
-                        tab.classList.add('active');
-                    } else {
-                        tab.classList.remove('active');
-                    }
-                });
-                
-                // Обновляем активное состояние контента
-                contents.forEach(content => {
-                    if (content.id === `${tabName}-content`) {
-                        content.classList.add('active');
-                    } else {
-                        content.classList.remove('active');
-                    }
-                });
-            }
-            
-            // Обработчики кликов для вкладок
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
-                    switchTab(tabName);
-                });
-            });
-            
-            // По умолчанию открываем вкладку "Очередь"
-            switchTab('queue');
-        });
-    </script>
+async function callAPI(endpoint, method = 'GET', body = null) {
+  const response = await fetch(`/api/${endpoint}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : null
+  });
+  return await response.json();
+}
 
-    <script>
-  // Получаем данные пользователя из Telegram
-  const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+// Обработка данных пользователя Telegram
+const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+
+if (tgUser) {
+  const userData = {
+    id: tgUser.id,
+    nickname: tgUser.username || `${tgUser.first_name} ${tgUser.last_name || ''}`.trim(),
+    first_name: tgUser.first_name
+  };
   
-  if (tgUser) {
-    localStorage.setItem('tg_user', JSON.stringify({
-      id: tgUser.id,
-      nickname: tgUser.username || `${tgUser.first_name} ${tgUser.last_name || ''}`.trim(),
-      first_name: tgUser.first_name
-    }));
+  localStorage.setItem('tg_user', JSON.stringify(userData));
+  
+  // Заменяем прямой вызов Supabase на API-запрос
+  callAPI('upsert_user', 'POST', {
+    telegram_id: tgUser.id,
+    nickname: tgUser.username || tgUser.first_name
+  }).then(data => {
+    console.log('Пользователь сохранен:', data);
+  });
+}
+
+// Оригинальный код переключения вкладок остается без изменений
+document.addEventListener('DOMContentLoaded', function() {
+  const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.content');
+  
+  function switchTab(tabName) {
+    tabs.forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
     
-    supabase.from('users').upsert({
-      telegram_id: tgUser.id,
-      nickname: tgUser.username || tgUser.first_name
-    }, { onConflict: 'telegram_id' });
+    contents.forEach(content => {
+      content.classList.toggle('active', content.id === `${tabName}-content`);
+    });
+    
+    // При переключении на вкладку обновляем ее данные
+    if (tabName === 'queue') {
+      loadQueueData();
+    } else if (tabName === 'profile') {
+      loadProfileData();
+    }
   }
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      switchTab(this.dataset.tab);
+    });
+  });
+  
+  switchTab('queue');
+});
+
+// Новые функции для работы с API
+async function loadQueueData() {
+  try {
+    const data = await callAPI('get_queue');
+    console.log('Данные очереди:', data);
+    // Здесь обновляем интерфейс очереди
+  } catch (error) {
+    console.error('Ошибка загрузки очереди:', error);
+  }
+}
+
+async function loadProfileData() {
+  const user = JSON.parse(localStorage.getItem('tg_user'));
+  if (!user) return;
+  
+  try {
+    const data = await callAPI(`get_user/${user.id}`);
+    console.log('Данные профиля:', data);
+    // Здесь обновляем интерфейс профиля
+  } catch (error) {
+    console.error('Ошибка загрузки профиля:', error);
+  }
+}
 </script>
     
 </body>
