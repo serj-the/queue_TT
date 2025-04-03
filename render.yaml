@@ -1,11 +1,18 @@
 # render.yaml
-
 services:
   - type: web
-    name: tennis-app-static
-    plan: free
-    buildCommand: ""
-    staticPublishPath: "./public"
+    name: tennis-app
+    runtime: python
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+    startCommand: |
+      gunicorn app:app
+    envVars:
+      - key: SUPABASE_URL
+        value: https://bpjwoqsphnjroqpkutji.supabase.co
+      - key: SUPABASE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwandvcXNwaG5qcm9xcGt1dGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2ODEwNzQsImV4cCI6MjA1OTI1NzA3NH0.hW7mKqGmXG0nTeBxjgHMhVVqaE2AFcC-kPnGAp_IceM
 
   # Опционально: Cron для очистки очереди
   - type: cron
