@@ -7,7 +7,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
     startCommand: |
-      gunicorn app:app
+      gunicorn wsgi:app
     envVars:
       - key: SUPABASE_URL
         value: https://bpjwoqsphnjroqpkutji.supabase.co
