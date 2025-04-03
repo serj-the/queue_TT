@@ -197,5 +197,24 @@
             switchTab('queue');
         });
     </script>
+
+    <script>
+  // Получаем данные пользователя из Telegram
+  const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+  
+  if (tgUser) {
+    localStorage.setItem('tg_user', JSON.stringify({
+      id: tgUser.id,
+      nickname: tgUser.username || `${tgUser.first_name} ${tgUser.last_name || ''}`.trim(),
+      first_name: tgUser.first_name
+    }));
+    
+    supabase.from('users').upsert({
+      telegram_id: tgUser.id,
+      nickname: tgUser.username || tgUser.first_name
+    }, { onConflict: 'telegram_id' });
+  }
+</script>
+    
 </body>
 </html>
