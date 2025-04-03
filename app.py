@@ -1,88 +1,42 @@
-from flask import Flask, request, jsonify, send_from_directory
-from supabase import create_client
+from flask import Flask, jsonify
 import os
-from datetime import datetime
+from supabase import create_client, Client
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__)
 
+# Проверка переменных окружения
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("Supabase credentials not set in environment variables")
+
+# Инициализация Supabase с обработкой ошибок
 try:
-    supabase: Client = create_client(
-        os.getenv('SUPABASE_URL'),
-        os.getenv('SUPABASE_KEY'),
-        options={
-            'auto_refresh_token': False,
-            'persist_session': False,
-            'detect_session_in_url': False
-        }
-    )
-    print("Supabase initialized successfully")
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    print("✅ Supabase client initialized successfully")
 except Exception as e:
-    print(f"Supabase init error: {str(e)}")
+    print(f"❌ Supabase init error: {str(e)}")
     raise
 
-# ================== API Endpoints ==================
-
 @app.route('/')
-def serve_frontend():
-    return send_from_directory(app.static_folder, 'index.html')
+def home():
+    return jsonify({"status": "OK", "supabase": "connected"})
 
-# --------- Пользователи ---------
-@app.route('/api/users/upsert', methods=['POST'])
-def upsert_user():
-    data = request.json
-    result = supabase.table('users').upsert({
-        "telegram_id": data['telegram_id'],
-        "nickname": data['nickname'],
-        "last_active": datetime.now().isoformat()
-    }, on_conflict="telegram_id").execute()
-    return jsonify(result.data)
+@app.route('/api/test')
+def test():
+    try:
+        # Тестовый запрос к любой таблице
+        response = supabase.table('users').select("*").limit(1).execute()
+        return jsonify({
+            "status": "success",
+            "data": response.data
+        })
+    except Exception as e:
+        return jsonify({
+            "error": str(e),
+            "solution": "Check your Supabase table permissions"
+        }), 500
 
-# --------- Споты ---------
-@app.route('/api/spots')
-def get_spots():
-    result = supabase.table('spots').select("*").execute()
-    return jsonify(result.data)
-
-# --------- Очереди ---------
-@app.route('/api/queues', methods=['GET'])
-def get_queues():
-    spot_id = request.args.get('spot_id')
-    query = supabase.table('queues').select("*, users(nickname), spots(name)")
-    
-    if spot_id:
-        query = query.eq("spot_id", spot_id)
-        
-    result = query.execute()
-    return jsonify(result.data)
-
-@app.route('/api/queues/join', methods=['POST'])
-def join_queue():
-    data = request.json
-    result = supabase.table('queues').insert({
-        "spot_id": data['spot_id'],
-        "user_id": data['user_id'],
-        "status": "waiting",
-        "joined_at": datetime.now().isoformat()
-    }).execute()
-    return jsonify(result.data)
-
-@app.route('/api/queues/leave', methods=['POST'])
-def leave_queue():
-    data = request.json
-    result = supabase.table('queues').update({
-        "status": "left",
-        "left_at": datetime.now().isoformat()
-    }).eq("user_id", data['user_id']).execute()
-    return jsonify(result.data)
-
-# --------- Рейтинги ---------
-@app.route('/api/ratings')
-def get_ratings():
-    result = supabase.table('users').select(
-        "telegram_id, nickname, rating"
-    ).order("rating", desc=True).limit(50).execute()
-    return jsonify(result.data)
-
-# ================== Запуск приложения ==================
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
