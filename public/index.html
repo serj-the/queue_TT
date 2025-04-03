@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tennis App</title>
+    <title>Tennis Spots MVP</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -149,6 +150,14 @@
             <span>Профиль</span>
         </div>
     </div>
+
+        <script>
+        // Конфиг Supabase
+        const SUPABASE_URL = 'https://bpjwoqsphnjroqpkutji.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwandvcXNwaG5qcm9xcGt1dGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2ODEwNzQsImV4cCI6MjA1OTI1NzA3NH0.hW7mKqGmXG0nTeBxjgHMhVVqaE2AFcC-kPnGAp_IceM';
+        
+        // Инициализация
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
