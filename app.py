@@ -1,12 +1,32 @@
-from flask import Flask, send_from_directory, jsonify
-import os
+from flask import Flask, send_from_directory, jsonify, request
 from supabase import create_client
+import os
+from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
 
+# Инициализация Supabase
+supabase = create_client(
+    os.getenv('SUPABASE_URL'),
+    os.getenv('SUPABASE_KEY')
+)
+
+# API endpoints
+@app.route('/api/queue', methods=['GET'])
+def get_queue():
+    spot_id = request.args.get('spot_id')
+    result = supabase.table('queue').select('*, user:user_id(nickname)').eq('spot_id', spot_id).execute()
+    return jsonify(result.data)
+
+@app.route('/api/user/<user_id>')
+def get_user(user_id):
+    result = supabase.table('users').select('*').eq('telegram_id', user_id).single().execute()
+    return jsonify(result.data)
+
+# Страницы
 @app.route('/')
 def home():
-    return send_from_directory('static', 'queue.html')  # По умолчанию очередь
+    return send_from_directory('static', 'queue.html')
 
 @app.route('/<page>')
 def serve_page(page):
