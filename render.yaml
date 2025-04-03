@@ -1,8 +1,20 @@
+# render.yaml
+
 services:
   - type: web
-    name: tennis-app
-    runtime: python
-    buildCommand: |
-      pip install -r requirements.txt
-    startCommand: |
-      gunicorn app:app
+    name: tennis-app-static
+    plan: free
+    buildCommand: ""
+    staticPublishPath: "./public"
+
+  # Опционально: Cron для очистки очереди
+  - type: cron
+    name: daily-cleanup
+    schedule: "0 0 * * *"
+    buildCommand: ""
+    runCommand: |
+      curl -X POST \
+      -H "apikey: $SUPABASE_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{ "query": "UPDATE queues SET status = ''left'' WHERE created_at < NOW() - INTERVAL ''1 day''" }' \
+      "$SUPABASE_URL/rest/v1/rpc/execute"
