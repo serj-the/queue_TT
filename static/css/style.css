@@ -1,0 +1,232 @@
+/* Базовые стили */
+:root {
+  --primary-color: #50b83c;
+  --secondary-color: #007bff;
+  --error-color: #de3618;
+  --text-color: #212529;
+  --bg-color: #f8f9fa;
+  --card-bg: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 16px;
+  max-width: 100%;
+  min-height: 100vh;
+}
+
+/* Контейнеры */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+.section {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Карточки спотов */
+.spot-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e1e4e8;
+  border-radius: var(--border-radius);
+  transition: transform 0.2s;
+}
+
+.spot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.spot-card h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+/* Очередь */
+.queue-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-color);
+}
+
+.queue-item.current-user {
+  background-color: #f0f7ff;
+  border-left-color: var(--secondary-color);
+}
+
+.position {
+  font-weight: bold;
+  margin-right: 12px;
+  min-width: 30px;
+}
+
+.user {
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.comment {
+  color: #6c757d;
+  font-size: 14px;
+  margin-left: 12px;
+  font-style: italic;
+}
+
+/* Кнопки */
+button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-select-spot, .btn-join {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-leave {
+  background-color: #f1f1f1;
+  color: var(--error-color);
+}
+
+.btn-select-spot:hover, .btn-join:hover {
+  background-color: #3a8c29;
+}
+
+.btn-leave:hover {
+  background-color: #e1e1e1;
+}
+
+/* Формы */
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Уведомления */
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { top: -50px; opacity: 0; }
+  to { top: 20px; opacity: 1; }
+}
+
+.error {
+  background-color: var(--error-color);
+}
+
+.success {
+  background-color: var(--primary-color);
+}
+
+/* Заголовки */
+h1, h2, h3 {
+  color: var(--text-color);
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-size: 24px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+h2 {
+  font-size: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+  .spot-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* Вкладки (если используете) */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.tab.active {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
