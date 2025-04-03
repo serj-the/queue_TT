@@ -7,16 +7,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Загрузка спотов
-    const spotsResponse = await fetch('/api/spots');
-    const spots = await spotsResponse.json();
-    
-    // Отрисовка выбора спота
-    const spotSelector = document.getElementById('spot-selector');
-    spotSelector.innerHTML = `
-        <select id="spot-select">
-            ${spots.map(spot => `<option value="${spot.id}">${spot.name}</option>`).join('')}
-        </select>
-    `;
+    try {
+        const spotsResponse = await fetch('/api/spots');
+        const spots = await spotsResponse.json();
+        
+        const spotSelect = document.getElementById('spot-select');
+        spotSelect.innerHTML = spots.map(spot => 
+            `<option value="${spot.id}">${spot.name}</option>`
+        ).join('');
+        
+        // Инициализация очереди
+        await updateQueue();
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
     
     // Обработчик кнопки
     document.getElementById('join-button').addEventListener('click', async () => {
