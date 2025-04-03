@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Проверяем авторизацию
     const user = JSON.parse(localStorage.getItem('tg_user'));
-    if (!user) return;
+    if (!user) {
+        alert('Пожалуйста, войдите через Telegram');
+        return;
+    }
 
     // Загрузка спотов
     const spotsResponse = await fetch('/api/spots');
