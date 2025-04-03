@@ -4,30 +4,26 @@ from supabase import create_client, Client
 
 app = Flask(__name__)
 
-# Конфиг Supabase
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# Инициализация Supabase (ключи берутся из переменных окружения)
+supabase = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
 
-@app.route('/')
-def home():
-    """Статическая страница (ваш фронтенд будет в /public)"""
-    return app.send_static_file('index.html')
-
-# API для работы с очередью
-@app.route('/api/join_queue', methods=['POST'])
-def join_queue():
-    data = request.json
-    response = supabase.table('queues').insert({
-        "spot_id": data['spot_id'],
-        "user_id": data['user_id'],
-        "status": "waiting"
-    }).execute()
+@app.route('/api/upsert_user', methods=['POST'])
+def upsert_user():
+    user_data = request.json
+    response = supabase.table('users').upsert({
+        "telegram_id": user_data['telegram_id'],
+        "nickname": user_data['nickname']
+    }, on_conflict="telegram_id").execute()
     return jsonify(response.data)
 
-@app.route('/api/get_queue/<spot_id>')
-def get_queue(spot_id):
-    response = supabase.table('queues').select("*").eq("spot_id", spot_id).execute()
+@app.route('/api/get_queue')
+def get_queue():
+    response = supabase.table('queues').select("*").execute()
+    return jsonify(response.data)
+
+@app.route('/api/get_user/<user_id>')
+def get_user(user_id):
+    response = supabase.table('users').select("*").eq("telegram_id", user_id).single().execute()
     return jsonify(response.data)
 
 if __name__ == '__main__':
