@@ -107,51 +107,56 @@
 </head>
 <body>
     <!-- Вкладка Карта -->
-    <div id="map-content" class="content">
-        <iframe 
-            src="https://yandex.ru/map-widget/v1/?um=constructor%3A364c361b98ec98810672f3b77dfe80b8487de7eac5cd0f7d7b694e1b883f34e4&amp;source=constructor"
-            class="yandex-iframe"
-            frameborder="0"
-            allowfullscreen
-            aria-label="Карта теннисных кортов">
-        </iframe>
-    </div>
+<div class="content" id="map-content" style="display: none;">
+  <!-- Контент карты -->
+  <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A364c361b98ec98810672f3b77dfe80b8487de7eac5cd0f7d7b694e1b883f34e4&amp;source=constructor"
+          class="yandex-iframe"
+          frameborder="0"
+          allowfullscreen
+          aria-label="Карта теннисных кортов">
+  </iframe>
+</div>
+
+<div class="content" id="queue-content" style="display: none;">
+  <!-- Контент очереди -->
+  <div id="queue-section">
+    <h2 id="current-spot-name"></h2>
+    <div id="queue-container"></div>
+    <textarea id="queue-comment" placeholder="Ваш комментарий (необязательно)"></textarea>
+    <button id="btn-join" class="btn-join">Встать в очередь</button>
+  </div>
+</div>
+
+<div class="content" id="profile-content" style="display: none;">
+  <!-- Контент профиля -->
+  <div class="profile-section">
+    <h2>Профиль</h2>
+    <div id="user-info"></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab" data-tab="map">
+    <svg class="tab-icon" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+    </svg>
+    <span>Карта</span>
+  </div>
+  <div class="tab" data-tab="queue">
+    <svg class="tab-icon" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M4 6h16v2H4zm2-4h12v2H6zm14 8H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 10H4v-8h16v8z"/>
+    </svg>
+    <span>Очередь</span>
+  </div>
+  <div class="tab" data-tab="profile">
+    <svg class="tab-icon" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </svg>
+    <span>Профиль</span>
+  </div>
+</div>
     
-    <!-- Вкладка Очередь (активна по умолчанию) -->
-    <div id="queue-content" class="content active">
-        <div class="queue-content">
-            <div class="queue-placeholder">Здесь будет очередь</div>
-        </div>
-    </div>
-    
-    <!-- Вкладка Профиль -->
-    <div id="profile-content" class="content">
-        <div class="profile-content">
-            <div class="profile-placeholder">Здесь будет профиль</div>
-        </div>
-    </div>
-    
-    <!-- Навигационные вкладки -->
-    <div class="tabs">
-        <div class="tab active" data-tab="map">
-            <svg class="tab-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
-            </svg>
-            <span>Карта</span>
-        </div>
-        <div class="tab" data-tab="queue">
-            <svg class="tab-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M4 6h16v2H4zm2-4h12v2H6zm14 8H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 10H4v-8h16v8z"/>
-            </svg>
-            <span>Очередь</span>
-        </div>
-        <div class="tab" data-tab="profile">
-            <svg class="tab-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            <span>Профиль</span>
-        </div>
-    </div>
+
 
     <script>
 async function callAPI(endpoint, method = 'GET', body = null) {
