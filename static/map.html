@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Карта кортов</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <script src="/js/map.js"></script>
+    <script src="/js/auth.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const user = JSON.parse(localStorage.getItem('current_user'));
+        if (!user) {
+            // Перенаправление или показ приветствия
+        }
+    });
+</script>
     <style>
         /* Reset и базовые стили */
         body, html {
