@@ -3,17 +3,18 @@ services:
   - type: web
     name: tennis-app
     runtime: python
-    env: python
     buildCommand: |
       pip install -r requirements.txt
     startCommand: |
-      gunicorn wsgi:app
+      gunicorn app:app
     envVars:
       - key: SUPABASE_URL
         value: https://bpjwoqsphnjroqpkutji.supabase.co
       - key: SUPABASE_KEY
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwandvcXNwaG5qcm9xcGt1dGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2ODEwNzQsImV4cCI6MjA1OTI1NzA3NH0.hW7mKqGmXG0nTeBxjgHMhVVqaE2AFcC-kPnGAp_IceM
-
+      - key: PYTHON_VERSION
+        value: 3.11.6
+        
   # Опционально: Cron для очистки очереди
   - type: cron
     name: daily-cleanup
