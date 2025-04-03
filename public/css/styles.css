@@ -1,0 +1,31 @@
+.tabs {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    padding: 10px 0;
+    border-radius: 20px;
+}
+
+.tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    color: gray;
+    transition: color 0.3s ease;
+}
+
+.tab.active {
+    color: black;
+}
+
+.tab-icon {
+    width: 30px;
+    height: 30px;
+}
