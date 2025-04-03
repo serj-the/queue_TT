@@ -4,28 +4,15 @@ from supabase import create_client
 
 app = Flask(__name__, static_folder='static')
 
-# Инициализация Supabase
-supabase = create_client(
-    os.getenv('SUPABASE_URL'),
-    os.getenv('SUPABASE_KEY')
-)
-
-# API маршруты
-@app.route('/api/ping')
-def ping():
-    return jsonify({"status": "ok"})
-
-# Главный маршрут для SPA
 @app.route('/')
-def index():
-    return send_from_directory(app.static_folder, 'index.html')
+def home():
+    return send_from_directory('static', 'queue.html')  # По умолчанию очередь
 
-# Fallback для всех SPA роутов
-@app.route('/<path:path>')
-def catch_all(path):
-    if os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, 'index.html')
+@app.route('/<page>')
+def serve_page(page):
+    if page in ['map', 'queue', 'profile']:
+        return send_from_directory('static', f'{page}.html')
+    return send_from_directory('static', 'queue.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
