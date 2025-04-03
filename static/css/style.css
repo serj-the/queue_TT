@@ -210,19 +210,29 @@ h2 {
   right: 0;
   padding: 12px 0;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
 
-.tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  opacity: 0.5;
-  cursor: pointer;
+.tab:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .tab.active {
   opacity: 1;
   color: var(--primary-color);
+  background-color: rgba(80, 184, 60, 0.1);
+}
+
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  fill: currentColor;
+}
+
+.tab span {
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .tab-icon {
