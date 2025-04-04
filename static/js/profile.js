@@ -1,48 +1,45 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    async function initApp() {
-        const tg = window.Telegram?.WebApp;
-        if (!tg?.initDataUnsafe?.user) {
-            showError('Приложение доступно только в Telegram');
-            return;
-        }
-
-        try {
-            tg.expand();
-            const tgUser = tg.initDataUnsafe.user;
-
-            // 1. Авторизация
-            const authResponse = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: String(tgUser.id),
-                    first_name: tgUser.first_name,
-                    last_name: tgUser.last_name || '',
-                    photo_url: tgUser.photo_url || ''
-                })
-            });
-
-            if (!authResponse.ok) {
-                throw new Error(`Auth failed: ${await authResponse.text()}`);
-            }
-
-            // 2. Загрузка профиля
-            await loadAndRenderProfile(String(tgUser.id));
-
-        } catch (error) {
-            console.error('Initialization error:', error);
-            showError(`Ошибка: ${error.message}`);
-        }
+    
+async function initApp() {
+    const tg = window.Telegram?.WebApp;
+    if (!tg?.initDataUnsafe?.user) {
+        console.error('Not in Telegram WebApp');
+        return;
     }
 
-    async function loadAndRenderProfile(335261856) {
-        try {
-            showLoader();
+    try {
+        tg.expand();
+        const tgUser = tg.initDataUnsafe.user;
+        
+        const authResponse = await fetch('/api/auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telegram_id: tgUser.id,
+                first_name: tgUser.first_name,
+                last_name: tgUser.last_name || '',
+                photo_url: tgUser.photo_url || ''
+            })
+        });
 
-            // Получаем данные пользователя
-            const response = await fetch(`/api/user?telegram_id=eq.${335261856}`);
+        if (!authResponse.ok) {
+            throw new Error('Auth failed');
+        }
+
+        console.log('User authenticated successfully');
+        
+    } catch (error) {
+        console.error('Initialization error:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+
+    
+        try {
+            const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -61,19 +58,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Profile load error:', error);
             showError(`Не удалось загрузить профиль: ${error.message}`);
         }
-    }
 
     function renderProfile(data) {
         if (!data) {
             throw new Error('No data provided');
         }
 
-        // Заполняем данные профиля
         const profilePhoto = document.querySelector('.profile-photo');
         const profileName = document.querySelector('.profile-info h2');
         
-        profilePhoto.src = data.photo_url || 'https://via.placeholder.com/150';
-        profilePhoto.onerror = () => { profilePhoto.src = 'https://via.placeholder.com/150'; };
+        profilePhoto.src = data.photo_url || null;
+        profilePhoto.onerror = () => { profilePhoto.src = null; };
         
         profileName.textContent = data.nickname || 
                                [data.first_name, data.last_name].filter(Boolean).join(' ').trim() || 
@@ -137,5 +132,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Инициализация
-    initApp();
+   await initApp();
 });
