@@ -82,7 +82,7 @@ def get_user(telegram_id: str):
             .single() \
             .execute()
 
-        # Получаем последние игры пользователя (пример)
+        # Получаем последние игры пользователя
         games_result = supabase.table('games') \
             .select('*, opponent:opponent_id(nickname, photo_url)') \
             .or_(f'player1_id.eq.{telegram_id},player2_id.eq.{telegram_id}') \
@@ -91,13 +91,14 @@ def get_user(telegram_id: str):
             .execute()
 
         user_data = user_result.data
-        user_data['last_games'] = games_result.data.map(game => ({
-            'opponent': game.opponent.nickname if game.opponent else 'Unknown',
-            'result': f"{game.player1_score}:{game.player2_score}",
-            'date': game.played_at.split('T')[0],
-            'is_win': (game.player1_id == telegram_id and game.player1_score > game.player2_score) or 
-                     (game.player2_id == telegram_id and game.player2_score > game.player1_score)
-        }))
+        # Заменяем JavaScript-синтаксис на Python
+        user_data['last_games'] = [{
+            'opponent': game['opponent']['nickname'] if game.get('opponent') else 'Unknown',
+            'result': f"{game['player1_score']}:{game['player2_score']}",
+            'date': game['played_at'].split('T')[0],
+            'is_win': (game['player1_id'] == telegram_id and game['player1_score'] > game['player2_score']) or 
+                     (game['player2_id'] == telegram_id and game['player2_score'] > game['player1_score'])
+        } for game in games_result.data]
 
         return jsonify(user_data)
     except Exception as e:
