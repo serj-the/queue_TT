@@ -27,31 +27,44 @@ def auth_user():
 
         telegram_id = str(data['telegram_id'])
         
-        # Формируем данные пользователя
+        # Безопасное извлечение данных
         user_data = {
             'telegram_id': telegram_id,
-            'nickname': data.get('nickname') or f"{data.get('first_name', 'User')}",
+            'nickname': data.get('nickname') or data.get('first_name', 'User'),
             'first_name': data.get('first_name', ''),
             'last_name': data.get('last_name', ''),
-            'username': data.get('username', ''),
             'photo_url': data.get('photo_url', ''),
             'last_active': datetime.now().isoformat()
         }
-
+        
         # Удаляем пустые значения
         user_data = {k: v for k, v in user_data.items() if v not in [None, '']}
 
-        # Используем upsert для создания/обновления пользователя
-        response = supabase.rpc('upsert_user', {
-            'p_telegram_id': user_data['telegram_id'],
-            'p_nickname': user_data['nickname'],
-            'p_first_name': user_data['first_name'],
-            'p_last_name': user_data['last_name'],
-            'p_username': user_data['username'],
-            'p_photo_url': user_data['photo_url']
-        }).execute()
+        # Проверяем существование пользователя
+        existing = supabase.from_('users') \
+                   .select('id') \
+                   .eq('telegram_id', telegram_id) \
+                   .execute()
 
-        return jsonify(response.data[0] if response.data else {'status': 'created'})
+        if existing.data:
+            # Обновляем существующего пользователя
+            result = supabase.from_('users') \
+                     .update(user_data) \
+                     .eq('telegram_id', telegram_id) \
+                     .execute()
+        else:
+            # Создаем нового пользователя
+            new_user = {
+                'rating': 1000,
+                'matches_played': 0,
+                'wins': 0,
+                **user_data
+            }
+            result = supabase.from_('users') \
+                     .insert(new_user) \
+                     .execute()
+
+        return jsonify(result.data[0] if result.data else {'status': 'created'})
 
     except Exception as e:
         app.logger.error(f"Auth error: {str(e)}")
@@ -178,6 +191,14 @@ def leave_queue():
 @app.route('/')
 def home():
     return send_from_directory('static', 'queue.html')
+
+@app.route('/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory('static/css', filename)
+
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory('static/js', filename)
 
 @app.route('/<page>')
 def serve_page(page):
