@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    telegram_id: String(tgUser.id),  // Явное преобразование в строку
+                    telegram_id: String(tgUser.id),
                     first_name: tgUser.first_name,
                     last_name: tgUser.last_name || '',
                     photo_url: tgUser.photo_url || ''
@@ -30,10 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 2. Загрузка профиля
             await loadAndRenderProfile(String(tgUser.id));
-            
-            // 3. Загрузка списка кортов для выбора
-            await loadSpots();
-            
+
         } catch (error) {
             console.error('Initialization error:', error);
             showError(`Ошибка: ${error.message}`);
@@ -44,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             showLoader();
 
+            // Получаем данные пользователя
             const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -57,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const profileData = users[0];
 
+            // Рендерим профиль
             renderProfile(profileData);
         } catch (error) {
             console.error('Profile load error:', error);
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('No data provided');
         }
 
-        // Основная информация
+        // Заполняем данные профиля
         const profilePhoto = document.querySelector('.profile-photo');
         const profileName = document.querySelector('.profile-info h2');
         
