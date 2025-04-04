@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, jsonify, request, render_template
+from flask import Flask, send_from_directory, jsonify, request,
 from supabase import create_client
 import os
 from datetime import datetime
@@ -151,10 +151,6 @@ def leave_queue():
 @app.route('/')
 def home():
     return send_from_directory('static', 'queue.html')
-
-@app.route('/scripts/<path:filename>')
-def serve_scripts(filename):
-    return send_from_directory('static/js', filename)
 
 @app.route('/<page>')
 def serve_page(page):
