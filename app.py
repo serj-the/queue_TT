@@ -98,10 +98,18 @@ def get_queue():
         return jsonify({'error': 'spot_id is required'}), 400
 
     try:
-        result = supabase.from_('queue').select('*, user:user_id(nickname, photo_url), spot:spot_id(name)')\
-            .eq('spot_id', spot_id).eq('status', 'waiting').order('joined_at').execute()
+        result = supabase.from_('queue').select(
+            '*, user:user_id(nickname, photo_url), spot:spot_id(name)'
+        ).eq('spot_id', spot_id).eq('status', 'waiting').order('joined_at').execute()
+
+        if result.error:
+            app.logger.error(f"Supabase error: {result.error}")
+            return jsonify({'error': str(result.error)}), 500
+
         return jsonify(result.data)
+
     except Exception as e:
+        app.logger.error(f"Queue fetch error: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/queue/join', methods=['POST'])
