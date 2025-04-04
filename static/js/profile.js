@@ -64,22 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Функция для загрузки и отображения списка кортов
-    async function loadSpots() {
-        try {
-            const spotsResponse = await fetch('/api/spots');
-            const spots = await spotsResponse.json();
-
-            const spotSelect = document.getElementById('spot-select');
-            spotSelect.innerHTML = spots.map(spot => 
-                `<option value="${spot.id}">${spot.name}</option>`
-            ).join('');
-        } catch (error) {
-            console.error('Ошибка загрузки кортов:', error);
-            showError('Не удалось загрузить список кортов');
-        }
-    }
-
     function renderProfile(data) {
         if (!data) {
             throw new Error('No data provided');
