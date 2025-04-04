@@ -40,21 +40,21 @@ def auth_user():
         # Удаляем пустые значения
         user_data = {k: v for k, v in user_data.items() if v not in [None, '']}
 
-        # Проверяем существование пользователя
-        supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+# Проверяем существование пользователя
+existing = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
 
-        if existing.data:
-            # Обновляем существующего пользователя
-            result = supabase.from_('users').update(user_data).eq('telegram_id', telegram_id).execute()
-        else:
-            # Создаем нового пользователя
-            new_user = {
-                'rating': 1000,
-                'matches_played': 0,
-                'wins': 0,
-                **user_data
-            }
-            result = supabase.from_('users').insert(new_user).execute()
+if existing.data:
+    # Обновляем существующего пользователя
+    result = supabase.from_('users').update(user_data).eq('telegram_id', telegram_id).execute()
+else:
+    # Создаем нового пользователя
+    new_user = {
+        'rating': 1000,
+        'matches_played': 0,
+        'wins': 0,
+        **user_data
+    }
+    result = supabase.from_('users').insert(new_user).execute()
 
         return jsonify(result.data[0] if result.data else {'status': 'created'})
 
