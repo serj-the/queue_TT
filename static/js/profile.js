@@ -45,18 +45,20 @@ async function initApp() {
 async function loadAndRenderProfile(telegramId) {
     try {
         showLoader();
-        
-        const response = await fetch(`/api/user/${telegramId}`);
+
+        const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const profileData = await response.json();
-        
-        if (!profileData || !profileData.telegram_id) {
-            throw new Error('Invalid profile data');
+
+        const users = await response.json();
+
+        if (!Array.isArray(users) || users.length === 0) {
+            throw new Error('User not found');
         }
-        
+
+        const profileData = users[0];
+
         renderProfile(profileData);
     } catch (error) {
         console.error('Profile load error:', error);
