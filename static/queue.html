@@ -144,41 +144,46 @@
     <script>
 document.addEventListener('DOMContentLoaded', async () => {
     const tg = window.Telegram?.WebApp;
-    
-    async function initApp() {
-        if (!tg?.initDataUnsafe?.user) {
-            return; // Не в Telegram WebApp
+    if (!tg) {
+        console.error('Not in Telegram WebApp');
+        return;
+    }
+
+    try {
+        tg.expand();
+        
+        const tgUser = tg.initDataUnsafe?.user;
+        if (!tgUser) {
+            throw new Error('No user data');
         }
 
-        try {
-            // Авторизуем пользователя при заходе в очередь
-            const response = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: tg.initDataUnsafe.user.id,
-                    first_name: tg.initDataUnsafe.user.first_name,
-                    last_name: tg.initDataUnsafe.user.last_name || '',
-                    photo_url: tg.initDataUnsafe.user.photo_url || ''
-                })
-            });
-            
-            if (!response.ok) throw new Error('Auth failed');
+        // Авторизация
+        const authData = {
+            telegram_id: tgUser.id,
+            first_name: tgUser.first_name || '',
+            last_name: tgUser.last_name || '',
+            photo_url: tgUser.photo_url || ''
+        };
+
+        const authResponse = await fetch('/api/auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(authData)
+        });
+
+        if (!authResponse.ok) {
+            throw new Error('Auth failed');
+        }
             
             // Инициализация очереди
             loadSpots();
         } catch (error) {
             console.error('Auth error:', error);
         }
-    }
+    });
 
-    if (tg) {
-        tg.expand();
-        initApp();
-    }
-});
 </script>
 
     <script>
