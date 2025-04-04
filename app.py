@@ -30,9 +30,8 @@ def auth_user():
         if not data or 'telegram_id' not in data:
             return jsonify({'error': 'Invalid request data'}), 400
 
-        telegram_id = str(data['telegram_id'])  # Преобразуем в строку
+        telegram_id = str(data['telegram_id'])  
         
-        # Проверяем существование пользователя
         existing = supabase.table('users') \
             .select('*') \
             .eq('telegram_id', telegram_id) \
@@ -58,7 +57,7 @@ def auth_user():
                 .eq('telegram_id', telegram_id) \
                 .execute()
         else:
-            # Создаем нового пользователя
+
             new_user = {
                 'telegram_id': telegram_id,
                 'rating': 1000,
@@ -80,11 +79,10 @@ def auth_user():
 @app.route('/api/user/<telegram_id>')
 def get_user(telegram_id: str):
     try:
-        # 1. Проверяем существование пользователя
         user_result = supabase.table('users') \
             .select('*') \
-            .eq('telegram_id', str(telegram_id)) \  # Явное преобразование в строку
-            .maybe_single() \  # Используем maybe_single вместо single
+            .eq('telegram_id', str(telegram_id)) \
+            .maybe_single() \  
             .execute()
 
         if not user_result.data:
@@ -94,7 +92,6 @@ def get_user(telegram_id: str):
                 'exists': False
             }), 404
 
-        # 2. Получаем игры только если пользователь существует
         try:
             games_result = supabase.table('games') \
                 .select('*, opponent:opponent_id(nickname, photo_url)') \
