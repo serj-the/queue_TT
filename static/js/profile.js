@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showLoader();
 
             // Получаем данные пользователя
-            const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
+            const response = await fetch(`/api/user?telegram_id=eq.${335261856}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
