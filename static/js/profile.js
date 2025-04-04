@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function initApp() {
     const tg = window.Telegram?.WebApp;
     if (!tg?.initDataUnsafe?.user) {
-        console.error('Not in Telegram WebApp');
         showError('Приложение доступно только в Telegram');
         return;
     }
@@ -11,34 +10,30 @@ async function initApp() {
         tg.expand();
         const tgUser = tg.initDataUnsafe.user;
         
-        // 1. Авторизация пользователя
+        // 1. Авторизация
         const authResponse = await fetch('/api/auth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                telegram_id: tgUser.id,
+                telegram_id: String(tgUser.id),  // Явное преобразование в строку
                 first_name: tgUser.first_name,
                 last_name: tgUser.last_name || '',
-                photo_url: tgUser.photo_url || '',
-                username: tgUser.username || ''
+                photo_url: tgUser.photo_url || ''
             })
         });
 
         if (!authResponse.ok) {
-            throw new Error(`Auth failed: ${authResponse.status}`);
+            throw new Error(`Auth failed: ${await authResponse.text()}`);
         }
 
-        const authData = await authResponse.json();
-        console.log('Auth successful:', authData);
-        
-        // 2. Загрузка профиля после успешной авторизации
-        await loadAndRenderProfile(tgUser.id);
+        // 2. Загрузка профиля
+        await loadAndRenderProfile(String(tgUser.id));
 
     } catch (error) {
         console.error('Initialization error:', error);
-        showError(`Ошибка инициализации: ${error.message}`);
+        showError(`Ошибка: ${error.message}`);
     }
 }
 
