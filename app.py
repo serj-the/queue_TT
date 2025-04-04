@@ -41,17 +41,11 @@ def auth_user():
         user_data = {k: v for k, v in user_data.items() if v not in [None, '']}
 
         # Проверяем существование пользователя
-        existing = supabase.from_('users') \
-                   .select('id') \
-                   .eq('telegram_id', telegram_id) \
-                   .execute()
+        supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
 
         if existing.data:
             # Обновляем существующего пользователя
-            result = supabase.from_('users') \
-                     .update(user_data) \
-                     .eq('telegram_id', telegram_id) \
-                     .execute()
+            result = supabase.from_('users').update(user_data).eq('telegram_id', telegram_id).execute()
         else:
             # Создаем нового пользователя
             new_user = {
@@ -60,9 +54,7 @@ def auth_user():
                 'wins': 0,
                 **user_data
             }
-            result = supabase.from_('users') \
-                     .insert(new_user) \
-                     .execute()
+            result = supabase.from_('users').insert(new_user).execute()
 
         return jsonify(result.data[0] if result.data else {'status': 'created'})
 
@@ -73,20 +65,12 @@ def auth_user():
 @app.route('/api/user/<telegram_id>')
 def get_user(telegram_id):
     try:
-        user_result = supabase.table('users') \
-            .select('*') \
-            .eq('telegram_id', telegram_id) \
-            .execute()
+        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
 
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
 
-        games_result = supabase.table('games') \
-            .select('*, opponent:opponent_id(nickname, photo_url)') \
-            .or_(f'player1_id.eq.{telegram_id},player2_id.eq.{telegram_id}') \
-            .order('played_at', desc=True) \
-            .limit(5) \
-            .execute()
+        games_result = supabase.table('games').select('*, opponent:opponent_id(nickname, photo_url)').or_(f'player1_id.eq.{telegram_id},player2_id.eq.{telegram_id}').order('played_at', desc=True).limit(5).execute()
 
         last_games = []
         for game in games_result.data:
@@ -110,9 +94,7 @@ def get_user(telegram_id):
 @app.route('/api/spots')
 def get_spots():
     try:
-        result = supabase.table('spots') \
-            .select('*') \
-            .execute()
+        result = supabase.table('spots').select('*').execute()
         return jsonify(result.data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -124,12 +106,7 @@ def get_queue():
         return jsonify({'error': 'spot_id is required'}), 400
     
     try:
-        result = supabase.table('queue') \
-            .select('*, user:user_id(nickname, photo_url), spot:spot_id(name)') \
-            .eq('spot_id', spot_id) \
-            .eq('status', 'waiting') \
-            .order('joined_at') \
-            .execute()
+        result = supabase.table('queue').select('*, user:user_id(nickname, photo_url), spot:spot_id(name)').eq('spot_id', spot_id).eq('status', 'waiting').order('joined_at').execute()
         return jsonify(result.data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -141,23 +118,17 @@ def join_queue():
         return jsonify({'error': 'spot_id and user_id are required'}), 400
     
     try:
-        existing = supabase.table('queue') \
-            .select('*') \
-            .eq('user_id', data['user_id']) \
-            .eq('status', 'waiting') \
-            .execute()
+        existing = supabase.table('queue').select('*').eq('user_id', data['user_id']).eq('status', 'waiting').execute()
         
         if existing.data:
             return jsonify({'error': 'User already in queue'}), 400
 
-        result = supabase.table('queue') \
-            .insert({
+        result = supabase.table('queue').insert({
                 'spot_id': data['spot_id'],
                 'user_id': data['user_id'],
                 'comment': data.get('comment', ''),
                 'status': 'waiting'
-            }) \
-            .execute()
+            }).execute()
         
         return jsonify(result.data[0])
 
@@ -171,14 +142,10 @@ def leave_queue():
         return jsonify({'error': 'user_id is required'}), 400
     
     try:
-        result = supabase.table('queue') \
-            .update({
+        result = supabase.table('queue').update({
                 'status': 'left',
                 'left_at': datetime.now().isoformat()
-            }) \
-            .eq('user_id', data['user_id']) \
-            .eq('status', 'waiting') \
-            .execute()
+            }).eq('user_id', data['user_id']).eq('status', 'waiting').execute()
         
         if not result.data:
             return jsonify({'error': 'No active queue found'}), 404
