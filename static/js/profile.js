@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', async () => {
 async function initApp() {
     const tg = window.Telegram?.WebApp;
     if (!tg?.initDataUnsafe?.user) {
@@ -135,6 +136,4 @@ function showError(message) {
         </div>
     `;
 }
-
-// Инициализация приложения
-document.addEventListener('DOMContentLoaded', initApp);
+});
