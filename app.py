@@ -27,6 +27,7 @@ def auth_user():
 
         telegram_id = str(data['telegram_id'])
 
+        # Безопасно подставляем значения или пустые строки
         user_data = {
             'telegram_id': telegram_id,
             'nickname': data.get('nickname') or f"User-{telegram_id[-4:]}",
@@ -35,8 +36,8 @@ def auth_user():
             'photo_url': data.get('photo_url', ''),
             'last_active': datetime.now().isoformat()
         }
-        user_data = {k: v for k, v in user_data.items() if v not in [None, '']}
 
+        # НЕ удаляем ключи с пустыми строками — они нужны для вызова RPC
         response = supabase.rpc('upsert_user', {
             'p_telegram_id': user_data['telegram_id'],
             'p_nickname': user_data['nickname'],
@@ -44,7 +45,6 @@ def auth_user():
             'p_last_name': user_data['last_name'],
             'p_photo_url': user_data['photo_url']
         }).execute()
-
 
         return jsonify(response.data[0] if response.data else {'status': 'created'})
 
