@@ -98,18 +98,42 @@ def get_queue():
         return jsonify({'error': 'spot_id is required'}), 400
 
     try:
-        result = supabase.from_('queue').select(
-            '*, user:user_id(nickname, photo_url), spot:spot_id(name)'
-        ).eq('spot_id', spot_id).eq('status', 'waiting').order('joined_at').execute()
+        # Получаем всех "ожидающих" пользователей на конкретной площадке
+        queue_result = supabase.from_('queue') \
+            .select('*') \
+            .eq('spot_id', spot_id) \
+            .eq('status', 'waiting') \
+            .order('joined_at') \
+            .execute()
 
-        if result.error:
-            app.logger.error(f"Supabase error: {result.error}")
-            return jsonify({'error': str(result.error)}), 500
+        queue_data = queue_result.data or []
 
-        return jsonify(result.data)
+        # По user_id тянем данные юзеров отдельно
+        user_ids = [item['user_id'] for item in queue_data]
+        users_result = supabase.from_('users') \
+            .select('telegram_id, nickname, photo_url') \
+            .in_('telegram_id', user_ids) \
+            .execute()
+        users_data = {user['telegram_id']: user for user in (users_result.data or [])}
+
+        # Склеиваем данные
+        response = []
+        for item in queue_data:
+            user_info = users_data.get(item['user_id'], {})
+            response.append({
+                'id': item['id'],
+                'user_id': item['user_id'],
+                'spot_id': item['spot_id'],
+                'status': item['status'],
+                'joined_at': item['joined_at'],
+                'comment': item.get('comment', ''),
+                'nickname': user_info.get('nickname', 'Unknown'),
+                'photo_url': user_info.get('photo_url', '')
+            })
+
+        return jsonify(response)
 
     except Exception as e:
-        app.logger.error(f"Queue fetch error: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/queue/join', methods=['POST'])
@@ -124,12 +148,12 @@ def join_queue():
         if existing.data:
             return jsonify({'error': 'User already in queue'}), 400
 
-        result = supabase.from_('queue').insert({
-            'spot_id': data['spot_id'],
-            'user_id': data['user_id'],
-            'comment': data.get('comment', ''),
-            'status': 'waiting'
-        }).execute()
+result = supabase.from_('queue') \
+    .select('*') \
+    .eq('spot_id', spot_id) \
+    .eq('status', 'waiting') \
+    .order('joined_at') \
+    .execute()
 
         return jsonify(result.data[0])
 
