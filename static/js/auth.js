@@ -1,3 +1,4 @@
+/*
 async function initTelegramUser() {
     if (!window.Telegram?.WebApp?.initDataUnsafe?.user) {
         console.warn('Telegram user not detected');
@@ -38,3 +39,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('User not authenticated');
     }
 });
+*/
