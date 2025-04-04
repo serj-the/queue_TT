@@ -21,29 +21,35 @@ def add_cors_headers(response):
 @app.route('/api/auth', methods=['POST'])
 def auth_user():
     try:
-        data = request.json
+        data = request.get_json()
         if not data or 'telegram_id' not in data:
             return jsonify({'error': 'Invalid request data'}), 400
 
         telegram_id = str(data['telegram_id'])
         
-        existing = supabase.table('users') \
-            .select('id') \
-            .eq('telegram_id', telegram_id) \
-            .execute()
+        # Проверяем существование пользователя
+        existing = supabase.from_('users') \
+                   .select('id') \
+                   .eq('telegram_id', telegram_id) \
+                   .execute()
 
         user_data = {
-            'nickname': data.get('nickname') or f"{data.get('first_name', '')} {data.get('last_name', '')}".strip(),
-            'photo_url': data.get('photo_url'),
+            'nickname': data.get('nickname') or f"{data.get('first_name', 'User')}",
+            'photo_url': data.get('photo_url', ''),
             'last_active': datetime.now().isoformat()
         }
 
+        # Удаляем None значения
+        user_data = {k: v for k, v in user_data.items() if v is not None}
+
         if existing.data:
-            result = supabase.table('users') \
-                .update(user_data) \
-                .eq('telegram_id', telegram_id) \
-                .execute()
+            # Обновляем существующего пользователя
+            result = supabase.from_('users') \
+                     .update(user_data) \
+                     .eq('telegram_id', telegram_id) \
+                     .execute()
         else:
+            # Создаем нового пользователя
             new_user = {
                 'telegram_id': telegram_id,
                 'rating': 1000,
@@ -51,15 +57,18 @@ def auth_user():
                 'wins': 0,
                 **user_data
             }
-            result = supabase.table('users') \
-                .insert(new_user) \
-                .execute()
+            result = supabase.from_('users') \
+                     .insert(new_user) \
+                     .execute()
 
         return jsonify(result.data[0] if result.data else {'status': 'created'})
 
     except Exception as e:
-        app.logger.error(f"Auth error: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500
+        app.logger.error(f"Auth error: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
 
 @app.route('/api/user/<telegram_id>')
 def get_user(telegram_id):
