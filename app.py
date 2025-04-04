@@ -105,19 +105,19 @@ def get_queue():
 
         queue_data = queue_result.data or []
 
-        user_ids = [item['user_id'] for item in queue_data]
+        telegram_ids = [item['telegram_id'] for item in queue_data]
         users_result = supabase.from_('users') \
             .select('telegram_id, nickname, photo_url') \
-            .in_('telegram_id', user_ids) \
+            .in_('telegram_id', telegram_ids) \
             .execute()
         users_data = {user['telegram_id']: user for user in (users_result.data or [])}
 
         response = []
         for item in queue_data:
-            user_info = users_data.get(item['user_id'], {})
+            user_info = users_data.get(item['telegram_id'], {})
             response.append({
                 'id': item['id'],
-                'user_id': item['user_id'],
+                'telegram_id': item['telegram_id'],
                 'spot_id': item['spot_id'],
                 'status': item['status'],
                 'joined_at': item['joined_at'],
@@ -134,24 +134,24 @@ def get_queue():
 @app.route('/api/queue/join', methods=['POST'])
 def join_queue():
     data = request.json
-    if not data or 'spot_id' not in data or 'user_id' not in data:
-        return jsonify({'error': 'spot_id and user_id are required'}), 400
+    if not data or 'spot_id' not in data or 'telegram_id' not in data:
+        return jsonify({'error': 'spot_id and telegram_id are required'}), 400
 
     try:
-        existing = supabase.from_('queue').select('*').eq('user_id', data['user_id']).eq('status', 'waiting').execute()
+        existing = supabase.from_('queue').select('*').eq('telegram_id', data['telegram_id']).eq('status', 'waiting').execute()
 
         if existing.data:
             return jsonify({'error': 'User already in queue'}), 400
 
-        result = supabase.from_('queue').insert({
+        supabase.from_('queue').insert({
+            'telegram_id': data['telegram_id'],
             'spot_id': data['spot_id'],
-            'user_id': data['user_id'],
             'status': 'waiting',
             'joined_at': datetime.now().isoformat(),
             'comment': data.get('comment', '')
         }).execute()
 
-        return jsonify(result.data[0] if result.data else {'status': 'joined'})
+        return jsonify({'success': True})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -159,14 +159,14 @@ def join_queue():
 @app.route('/api/queue/leave', methods=['POST'])
 def leave_queue():
     data = request.json
-    if not data or 'user_id' not in data:
-        return jsonify({'error': 'user_id is required'}), 400
+    if not data or 'telegram_id' not in data:
+        return jsonify({'error': 'telegram_id is required'}), 400
 
     try:
         result = supabase.from_('queue').update({
             'status': 'left',
             'left_at': datetime.now().isoformat()
-        }).eq('user_id', data['user_id']).eq('status', 'waiting').execute()
+        }).eq('telegram_id', data['telegram_id']).eq('status', 'waiting').execute()
 
         if not result.data:
             return jsonify({'error': 'No active queue found'}), 404
