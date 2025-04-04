@@ -1,52 +1,40 @@
-document.addEventListener('DOMContentLoaded', async () => {
+async function initApp() {
     const tg = window.Telegram?.WebApp;
-    
-    // Если есть данные Telegram, авторизуем пользователя
-    if (tg?.initDataUnsafe?.user) {
-        const tgUser = tg.initDataUnsafe.user;
-        try {
-            const authResponse = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: tgUser.id,
-                    first_name: tgUser.first_name,
-                    last_name: tgUser.last_name || '',
-                    username: tgUser.username || '',
-                    photo_url: tgUser.photo_url || '',
-                    auth_date: tg.initDataUnsafe.auth_date,
-                    hash: tg.initDataUnsafe.hash
-                })
-            });
-            
-            const userData = await authResponse.json();
-            localStorage.setItem('current_user', JSON.stringify(userData));
-            await loadAndRenderProfile(userData.telegram_id);
-        } catch (error) {
-            console.error('Auth error:', error);
-        }
-    } else {
-        // Пытаемся загрузить из localStorage
-        const savedUser = JSON.parse(localStorage.getItem('current_user'));
-        if (savedUser?.telegram_id) {
-            await loadAndRenderProfile(savedUser.telegram_id);
-        } else {
-            // Нет данных пользователя - перенаправляем или показываем ошибку
-            window.location.href = '/';
-        }
+    if (!tg?.initDataUnsafe?.user) {
+        console.error('Not in Telegram WebApp');
+        return;
     }
-    
-    // Обработчик кнопки редактирования
-    document.querySelector('.edit-profile')?.addEventListener('click', () => {
-        if (tg) {
-            tg.showAlert('Редактирование профиля будет доступно в следующей версии');
-        } else {
-            alert('Редактирование профиля');
+
+    try {
+        tg.expand();
+        const tgUser = tg.initDataUnsafe.user;
+        
+        const authResponse = await fetch('/api/auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telegram_id: tgUser.id,
+                first_name: tgUser.first_name,
+                last_name: tgUser.last_name || '',
+                photo_url: tgUser.photo_url || ''
+            })
+        });
+
+        if (!authResponse.ok) {
+            throw new Error('Auth failed');
         }
-    });
-});
+
+        console.log('User authenticated successfully');
+        
+    } catch (error) {
+        console.error('Initialization error:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+
 
 async function loadAndRenderProfile(telegramId) {
     try {
