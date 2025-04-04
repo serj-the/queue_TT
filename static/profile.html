@@ -12,353 +12,361 @@
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             overflow: hidden;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
         }
         
-/* Стили профиля */
-.profile-container {
-    padding: 15px;
-}
-
-.profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.profile-photo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 15px;
-    border: 2px solid var(--tg-theme-button-color);
-}
-
-.rating-badge {
-    background: var(--tg-theme-secondary-bg-color);
-    padding: 5px 10px;
-    border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.rank {
-    font-size: 0.8em;
-    margin-left: 5px;
-    opacity: 0.8;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.stat-card {
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-.stat-label {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
-.section-title {
-    margin: 20px 0 10px;
-    font-size: 1.1em;
-}
-
-.games-list {
-    margin-bottom: 20px;
-}
-
-.game-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
-}
-
-.game-item:last-child {
-    border-bottom: none;
-}
-
-.opponent {
-    flex: 2;
-}
-
-.result {
-    flex: 1;
-    text-align: center;
-    font-weight: bold;
-}
-
-.result.win {
-    color: #4CAF50;
-}
-
-.result.lose {
-    color: #F44336;
-}
-
-.game-date {
-    flex: 1;
-    text-align: right;
-    opacity: 0.7;
-    font-size: 0.9em;
-}
-
-/* Стили рейтинга */
-.rating-container {
-    padding: 15px;
-}
-
-.tg-select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--tg-theme-secondary-bg-color);
-    background: var(--tg-theme-bg-color);
-    color: var(--tg-theme-text-color);
-    margin-bottom: 15px;
-}
-
-.players-list {
-    margin-top: 10px;
-}
-
-.player-card {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 10px;
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 10px;
-}
-
-.player-card.current-user {
-    border-left: 3px solid var(--tg-theme-button-color);
-}
-
-.player-rank {
-    font-weight: bold;
-    margin-right: 15px;
-    width: 20px;
-    text-align: center;
-}
-
-.player-info {
-    flex: 1;
-}
-
-.player-info h3 {
-    margin-bottom: 3px;
-}
-
-.player-info p {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
-.player-rating {
-    text-align: right;
-}
-
-.rating-value {
-    font-weight: bold;
-}
-
-.rating-change {
-    display: block;
-    font-size: 0.7em;
-    color: #4CAF50;
-}
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        /* Стили профиля */
+        .profile-container {
             padding: 15px;
+            max-width: 100%;
+            box-sizing: border-box;
         }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--tg-theme-button-color);
+        }
+
+        .rating-badge {
+            background: var(--tg-theme-secondary-bg-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+
+        .rank {
+            font-size: 0.8em;
+            margin-left: 5px;
+            opacity: 0.8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
         .stat-card {
-            background: white;
+            background: var(--tg-theme-secondary-bg-color);
             border-radius: 10px;
             padding: 15px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .section-title {
+            margin: 20px 0 10px;
+            font-size: 1.1em;
+        }
+
+        .games-list {
+            margin-bottom: 20px;
+        }
+
+        .game-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
+        }
+
+        .game-item:last-child {
+            border-bottom: none;
+        }
+
+        .opponent {
+            flex: 2;
+        }
+
+        .result {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .result.win {
+            color: #4CAF50;
+        }
+
+        .result.lose {
+            color: #F44336;
+        }
+
+        .game-date {
+            flex: 1;
+            text-align: right;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        .tg-button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .error-message button {
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
         /* Нижняя панель */
         .tabs {
             position: fixed;
-            bottom: -15px; /* Поднимаем на половину высоты */
+            bottom: -15px;
             left: 0;
             right: 0;
             height: 60px;
             display: flex;
             justify-content: space-around;
-            background: white;
+            background: var(--tg-theme-bg-color);
             border-radius: 20px 20px 0 0;
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
             z-index: 2;
             padding: 10px 0 25px 0;
         }
-        
-        /* Элементы панели */
+
         .tab {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            color: #666;
+            color: var(--tg-theme-hint-color);
             flex: 1;
             max-width: 100px;
         }
-        
+
         .tab.active {
-            color: #50b83c;
+            color: var(--tg-theme-button-color);
             transform: translateY(-5px);
         }
-        
+
         .tab-icon {
             width: 24px;
             height: 24px;
             margin-bottom: 2px;
         }
-        
+
         .tab span {
             font-size: 12px;
             font-weight: 500;
         }
-        
-        /* Темная тема для Telegram */
-        @media (prefers-color-scheme: dark) {
-            .tabs {
-                background: #1e1e1e;
-            }
-            .tab {
-                color: #aaa;
-            }
-            .tab.active {
-                color: #50b83c;
-            }
-        }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/js/auth.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        const user = JSON.parse(localStorage.getItem('current_user'));
-        if (!user) {
-        }
-    });
-</script>
-    <script src="/js/profile.js"></script>
 </head>
 <body>
 <div class="profile-container">
     <div class="profile-header">
-        <img src="{{ user.photo_url }}" alt="Фото профиля" class="profile-photo">
+        <img src="" alt="Фото профиля" class="profile-photo">
         <div class="profile-info">
-            <h2>{{ user.name }}</h2>
+            <h2>Загрузка...</h2>
             <div class="rating-badge">
-                ⭐ {{ user.rating }} 
-                <span class="rank">({{ (user.wins/user.matches*100)|round }}% побед)</span>
+                ⭐ <span class="rating-value">0</span> 
+                <span class="rank">(0% побед)</span>
             </div>
         </div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-value">{{ user.matches }}</div>
+            <div class="stat-value matches">0</div>
             <div class="stat-label">Матчей</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value">{{ user.wins }}</div>
+            <div class="stat-value wins">0</div>
             <div class="stat-label">Побед</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value">{{ user.matches - user.wins }}</div>
+            <div class="stat-value loses">0</div>
             <div class="stat-label">Поражений</div>
         </div>
     </div>
 
     <h3 class="section-title">Последние игры</h3>
     <div class="games-list">
-        {% for game in user.last_games %}
-        <div class="game-item">
-            <span class="opponent">{{ game.opponent }}</span>
-            <span class="result {% if game.result.split(':')[0] > game.result.split(':')[1] %}win{% else %}lose{% endif %}">
-                {{ game.result }}
-            </span>
-            <span class="game-date">{{ game.date }}</span>
-        </div>
-        {% endfor %}
+        <p>Загрузка истории игр...</p>
     </div>
 
     <button class="tg-button edit-profile">Редактировать профиль</button>
 </div>
-    <!-- Нижняя панель -->
-    <div class="tabs">
-        <a href="/map" class="tab active">
-            <svg class="tab-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
-            </svg>
-            <span>Карта</span>
-        </a>
-        <a href="/queue" class="tab">
-            <svg class="tab-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M4 6h16v2H4zm2-4h12v2H6zm14 8H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 10H4v-8h16v8z"/>
-            </svg>
-            <span>Очередь</span>
-        </a>
-        <a href="/profile" class="tab">
-            <svg class="tab-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            <span>Профиль</span>
-        </a>
-    </div>
 
-    <script>
-        // Динамическая подстройка высоты
-        function adjustMapHeight() {
-            const mapContainer = document.querySelector('.map-iframe-container');
-            const tabs = document.querySelector('.tabs');
-            
-            if (mapContainer && tabs) {
-                const tabsHeight = tabs.offsetHeight;
-                mapContainer.style.bottom = `${tabsHeight/2}px`;
-            }
-        }
-    </script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/js/auth.js"></script>
-    <script>
-        async function loadProfile() {
-            const user = JSON.parse(localStorage.getItem('current_user'));
-            if (!user) return;
-            
+<!-- Нижняя панель -->
+<div class="tabs">
+    <a href="/map" class="tab">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+        </svg>
+        <span>Карта</span>
+    </a>
+    <a href="/queue" class="tab">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M4 6h16v2H4zm2-4h12v2H6zm14 8H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 10H4v-8h16v8z"/>
+        </svg>
+        <span>Очередь</span>
+    </a>
+    <a href="/profile" class="tab active">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+        <span>Профиль</span>
+    </a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const tg = window.Telegram?.WebApp;
+        
+        // Если есть данные Telegram, авторизуем пользователя
+        if (tg?.initDataUnsafe?.user) {
+            const tgUser = tg.initDataUnsafe.user;
             try {
-                const response = await fetch(`/api/user/${user.telegram_id}`);
-                const profileData = await response.json();
-                renderProfile(profileData);
+                const authResponse = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: tgUser.id,
+                        first_name: tgUser.first_name,
+                        last_name: tgUser.last_name || '',
+                        username: tgUser.username || '',
+                        photo_url: tgUser.photo_url || '',
+                        auth_date: tg.initDataUnsafe.auth_date,
+                        hash: tg.initDataUnsafe.hash
+                    })
+                });
+                
+                const userData = await authResponse.json();
+                localStorage.setItem('current_user', JSON.stringify(userData));
+                await loadAndRenderProfile(userData.telegram_id);
             } catch (error) {
-                console.error('Profile load error:', error);
+                console.error('Auth error:', error);
+                showError('Ошибка авторизации');
+            }
+        } else {
+            // Пытаемся загрузить из localStorage
+            const savedUser = JSON.parse(localStorage.getItem('current_user'));
+            if (savedUser?.telegram_id) {
+                await loadAndRenderProfile(savedUser.telegram_id);
+            } else {
+                showError('Пользователь не найден');
             }
         }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadProfile();
+        
+        // Обработчик кнопки редактирования
+        document.querySelector('.edit-profile')?.addEventListener('click', () => {
+            if (tg) {
+                tg.showAlert('Редактирование профиля будет доступно в следующей версии');
+            } else {
+                alert('Редактирование профиля');
+            }
         });
-    </script>
+
+        // Инициализация Telegram WebApp
+        if (tg) {
+            tg.expand();
+            tg.enableClosingConfirmation();
+        }
+    });
+
+    async function loadAndRenderProfile(telegramId) {
+        try {
+            const response = await fetch(`/api/user/${telegramId}`);
+            if (!response.ok) throw new Error('Profile not found');
+            
+            const profileData = await response.json();
+            renderProfile(profileData);
+        } catch (error) {
+            console.error('Profile load error:', error);
+            showError('Не удалось загрузить профиль');
+        }
+    }
+
+    function renderProfile(data) {
+        if (!data) return;
+
+        // Основная информация
+        document.querySelector('.profile-photo').src = data.photo_url || 'https://via.placeholder.com/150';
+        document.querySelector('.profile-info h2').textContent = data.nickname || `${data.first_name} ${data.last_name || ''}`.trim();
+        
+        // Рейтинг и статистика
+        const winPercentage = data.matches_played > 0 
+            ? Math.round((data.wins / data.matches_played) * 100) 
+            : 0;
+        
+        document.querySelector('.rating-value').textContent = data.rating || 1000;
+        document.querySelector('.rank').textContent = `(${winPercentage}% побед)`;
+        
+        document.querySelector('.matches').textContent = data.matches_played || 0;
+        document.querySelector('.wins').textContent = data.wins || 0;
+        document.querySelector('.loses').textContent = (data.matches_played || 0) - (data.wins || 0);
+        
+        // Последние игры
+        const gamesList = document.querySelector('.games-list');
+        if (data.last_games && data.last_games.length > 0) {
+            gamesList.innerHTML = data.last_games.map(game => `
+                <div class="game-item">
+                    <span class="opponent">${game.opponent || 'Unknown'}</span>
+                    <span class="result ${game.is_win ? 'win' : 'lose'}">
+                        ${game.result}
+                    </span>
+                    <span class="game-date">${game.date}</span>
+                </div>
+            `).join('');
+        } else {
+            gamesList.innerHTML = '<p>Нет данных о последних играх</p>';
+        }
+    }
+
+    function showError(message) {
+        document.querySelector('.profile-container').innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+                <button onclick="window.location.href='/'">На главную</button>
+            </div>
+        `;
+    }
+</script>
 </body>
 </html>
