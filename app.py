@@ -22,6 +22,88 @@ def add_cors_headers(response):
     return response
 
 # API endpoints
+
+@app.route('/api/auth', methods=['POST'])
+def auth_user():
+    try:
+        data = request.json
+        if not data or 'telegram_id' not in data:
+            return jsonify({'error': 'Invalid request data'}), 400
+
+        # Проверяем подпись Telegram (должна быть реализована)
+        # if not verify_telegram_auth(data):
+        #     return jsonify({'error': 'Invalid Telegram auth'}), 401
+
+        user_data = {
+            'telegram_id': data['telegram_id'],
+            'first_name': data.get('first_name', ''),
+            'last_name': data.get('last_name', ''),
+            'username': data.get('username', ''),
+            'photo_url': data.get('photo_url', ''),
+            'nickname': data.get('first_name', 'Игрок'),
+            'last_active': datetime.now().isoformat()
+        }
+
+        # Проверяем существование пользователя
+        existing_user = supabase.table('users') \
+            .select('*') \
+            .eq('telegram_id', user_data['telegram_id']) \
+            .execute()
+
+        if existing_user.data:
+            # Обновляем существующего пользователя
+            result = supabase.table('users') \
+                .update(user_data) \
+                .eq('telegram_id', user_data['telegram_id']) \
+                .execute()
+        else:
+            # Создаем нового пользователя с дефолтными значениями
+            user_data.update({
+                'rating': 1000,
+                'matches_played': 0,
+                'wins': 0,
+                'created_at': datetime.now().isoformat()
+            })
+            result = supabase.table('users') \
+                .insert(user_data) \
+                .execute()
+
+        return jsonify(result.data[0])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/user/<telegram_id>')
+def get_user(telegram_id: str):
+    try:
+        # Получаем основную информацию о пользователе
+        user_result = supabase.table('users') \
+            .select('*') \
+            .eq('telegram_id', telegram_id) \
+            .single() \
+            .execute()
+
+        # Получаем последние игры пользователя (пример)
+        games_result = supabase.table('games') \
+            .select('*, opponent:opponent_id(nickname, photo_url)') \
+            .or_(f'player1_id.eq.{telegram_id},player2_id.eq.{telegram_id}') \
+            .order('played_at', desc=True) \
+            .limit(5) \
+            .execute()
+
+        user_data = user_result.data
+        user_data['last_games'] = games_result.data.map(game => ({
+            'opponent': game.opponent.nickname if game.opponent else 'Unknown',
+            'result': f"{game.player1_score}:{game.player2_score}",
+            'date': game.played_at.split('T')[0],
+            'is_win': (game.player1_id == telegram_id and game.player1_score > game.player2_score) or 
+                     (game.player2_id == telegram_id and game.player2_score > game.player1_score)
+        }))
+
+        return jsonify(user_data)
+    except Exception as e:
+        print(f"Error fetching user: {str(e)}")
+        return jsonify({'error': 'User not found'}), 404
+
 @app.route('/api/queue', methods=['GET'])
 def get_queue():
     spot_id = request.args.get('spot_id')
