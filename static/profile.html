@@ -154,7 +154,7 @@
         /* Нижняя панель */
 .tabs {
     position: fixed;
-    bottom: 20px; /* Отступ от нижнего края */
+    bottom: 25px; /* Отступ от нижнего края */
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 40px); /* Ширина с отступами по бокам */
@@ -260,76 +260,83 @@
 </div>
 
 <script>
-<script>
 document.addEventListener('DOMContentLoaded', async () => {
     const tg = window.Telegram?.WebApp;
     
-    async function authAndLoadProfile() {
-        try {
-            // 1. Авторизуем пользователя
-            const authData = {
+    if (!tg?.initDataUnsafe?.user) {
+        window.location.href = '/queue';
+        return;
+    }
+
+    try {
+        tg.expand();
+        
+        // 1. Авторизация
+        const authResponse = await fetch('/api/auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 telegram_id: tg.initDataUnsafe.user.id,
                 first_name: tg.initDataUnsafe.user.first_name,
                 last_name: tg.initDataUnsafe.user.last_name || '',
-                photo_url: tg.initDataUnsafe.user.photo_url || ''
-            };
+                photo_url: tg.initDataUnsafe.user.photo_url || '',
+                username: tg.initDataUnsafe.user.username || ''
+            })
+        });
 
-            const authResponse = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(authData)
-            });
-
-            if (!authResponse.ok) throw new Error('Auth failed');
-            
-            // 2. Загружаем профиль
-            const profileResponse = await fetch(`/api/user/${tg.initDataUnsafe.user.id}`);
-            if (!profileResponse.ok) throw new Error('Profile load failed');
-            
-            const profileData = await profileResponse.json();
-            renderProfile(profileData);
-            
-        } catch (error) {
-            console.error('Error:', error);
-            document.body.innerHTML = `
-                <div style="padding:20px;text-align:center;">
-                    <h3>Ошибка загрузки профиля</h3>
-                    <button onclick="window.location.href='/queue'" 
-                            style="padding:10px;background:#0088cc;color:white;border:none;border-radius:5px;">
-                        Вернуться в очередь
-                    </button>
-                </div>
-            `;
+        if (!authResponse.ok) {
+            throw new Error('Auth failed');
         }
-    }
 
-    if (tg?.initDataUnsafe?.user) {
-        tg.expand();
-        authAndLoadProfile();
-    } else {
-        window.location.href = '/queue';
+        // 2. Загрузка профиля
+        const profileResponse = await fetch(`/api/user/${tg.initDataUnsafe.user.id}`);
+        if (!profileResponse.ok) {
+            throw new Error('Profile load failed');
+        }
+
+        const profileData = await profileResponse.json();
+        renderProfile(profileData);
+
+    } catch (error) {
+        console.error('Error:', error);
+        document.body.innerHTML = `
+            <div class="error-container">
+                <h3>Ошибка загрузки</h3>
+                <p>${error.message}</p>
+                <button onclick="window.location.href='/queue'" class="tg-button">
+                    Вернуться в очередь
+                </button>
+            </div>
+        `;
     }
 });
 
 function renderProfile(data) {
     document.querySelector('.profile-photo').src = data.photo_url || '/default-avatar.jpg';
     document.querySelector('.profile-info h2').textContent = data.nickname || 'Игрок';
+    
+    const winPercentage = data.matches_played > 0 
+        ? Math.round((data.wins / data.matches_played) * 100)
+        : 0;
+    
     document.querySelector('.rating-value').textContent = data.rating || 1000;
-    document.querySelector('.matches').textContent = data.matches_played || 0;
-    document.querySelector('.wins').textContent = data.wins || 0;
-    document.querySelector('.loses').textContent = (data.matches_played || 0) - (data.wins || 0);
+    document.querySelector('.rank').textContent = `(${winPercentage}% побед)`;
+    
+    document.querySelector('.stat-value.matches').textContent = data.matches_played || 0;
+    document.querySelector('.stat-value.wins').textContent = data.wins || 0;
+    document.querySelector('.stat-value.loses').textContent = (data.matches_played || 0) - (data.wins || 0);
     
     const gamesList = document.querySelector('.games-list');
     if (data.last_games?.length > 0) {
         gamesList.innerHTML = data.last_games.map(game => `
             <div class="game-item">
-                <span class="opponent">${game.opponent}</span>
+                <span class="opponent">${game.opponent || 'Unknown'}</span>
                 <span class="result ${game.is_win ? 'win' : 'lose'}">
-                    ${game.result}
+                    ${game.result || '0:0'}
                 </span>
-                <span class="game-date">${game.date}</span>
+                <span class="game-date">${game.date || 'N/A'}</span>
             </div>
         `).join('');
     } else {
