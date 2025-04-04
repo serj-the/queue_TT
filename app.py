@@ -37,28 +37,14 @@ def auth_user():
         }
         user_data = {k: v for k, v in user_data.items() if v not in [None, '']}
 
-        existing = supabase.from_('users').select('*').eq('telegram_id', telegram_id).execute()
-
-        if existing.data:
-            result = supabase.from_('users').update(user_data).eq('telegram_id', telegram_id).execute()
-        else:
-            new_user = {
-                'rating': 1000,
-                'matches_played': 0,
-                'wins': 0,
-                **user_data
-            }
-            result = supabase.from_('users').insert(new_user).execute()
-
-        return jsonify(result.data[0] if result.data else {'status': 'created'})
-
-            response = supabase.rpc('upsert_user', {
+        response = supabase.rpc('upsert_user', {
             'p_telegram_id': user_data['telegram_id'],
             'p_nickname': user_data['nickname'],
             'p_first_name': user_data['first_name'],
             'p_last_name': user_data['last_name'],
             'p_photo_url': user_data['photo_url']
         }).execute()
+
 
         return jsonify(response.data[0] if response.data else {'status': 'created'})
 
