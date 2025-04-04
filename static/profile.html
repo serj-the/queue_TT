@@ -208,7 +208,7 @@
         <div class="profile-info">
             <h2>Загрузка...</h2>
             <div class="rating-badge">
-                ⭐ <span class="rating-value">0</span> 
+                ⭐ <span class="rating-value">0</span>
                 <span class="rank">(0% побед)</span>
             </div>
         </div>
@@ -259,95 +259,7 @@
     </a>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg) {
-        console.error('Not in Telegram WebApp');
-        return;
-    }
-
-    try {
-        tg.expand();
-        
-        const tgUser = tg.initDataUnsafe?.user;
-        if (!tgUser) {
-            throw new Error('No user data');
-        }
-
-        // Авторизация
-        const authData = {
-            telegram_id: tgUser.id,
-            first_name: tgUser.first_name || '',
-            last_name: tgUser.last_name || '',
-            photo_url: tgUser.photo_url || ''
-        };
-
-        const authResponse = await fetch('/api/auth', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(authData)
-        });
-
-        if (!authResponse.ok) {
-            throw new Error('Auth failed');
-        }
-        // 2. Загрузка профиля
-        const profileResponse = await fetch(`/api/user/${tg.initDataUnsafe.user.id}`);
-        if (!profileResponse.ok) {
-            throw new Error('Profile load failed');
-        }
-
-        const profileData = await profileResponse.json();
-        renderProfile(profileData);
-
-    } catch (error) {
-        console.error('Error:', error);
-        document.body.innerHTML = `
-            <div class="error-container">
-                <h3>Ошибка загрузки</h3>
-                <p>${error.message}</p>
-                <button onclick="window.location.href='/queue'" class="tg-button">
-                    Вернуться в очередь
-                </button>
-            </div>
-        `;
-    }
-});
-
-function renderProfile(data) {
-    document.querySelector('.profile-photo').src = data.photo_url || '/default-avatar.jpg';
-    document.querySelector('.profile-info h2').textContent = data.nickname || 'Игрок';
-    
-    const winPercentage = data.matches_played > 0 
-        ? Math.round((data.wins / data.matches_played) * 100)
-        : 0;
-    
-    document.querySelector('.rating-value').textContent = data.rating || 1000;
-    document.querySelector('.rank').textContent = `(${winPercentage}% побед)`;
-    
-    document.querySelector('.stat-value.matches').textContent = data.matches_played || 0;
-    document.querySelector('.stat-value.wins').textContent = data.wins || 0;
-    document.querySelector('.stat-value.loses').textContent = (data.matches_played || 0) - (data.wins || 0);
-    
-    const gamesList = document.querySelector('.games-list');
-    if (data.last_games?.length > 0) {
-        gamesList.innerHTML = data.last_games.map(game => `
-            <div class="game-item">
-                <span class="opponent">${game.opponent || 'Unknown'}</span>
-                <span class="result ${game.is_win ? 'win' : 'lose'}">
-                    ${game.result || '0:0'}
-                </span>
-                <span class="game-date">${game.date || 'N/A'}</span>
-            </div>
-        `).join('');
-    } else {
-        gamesList.innerHTML = '<p>Нет данных о последних играх</p>';
-    }
-}
-
-</script>
+<!-- Внешний JS с логикой -->
+<script src="/scripts/profile.js"></script>
 </body>
 </html>
