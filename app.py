@@ -200,14 +200,6 @@ def upsert_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/user/<telegram_id>')
-def get_user(telegram_id: str):
-    try:
-        result = supabase.table('users').select('*').eq('telegram_id', telegram_id).single().execute()
-        return jsonify(result.data)
-    except Exception as e:
-        return jsonify({'error': 'User not found'}), 404
-
 # Статические файлы
 @app.route('/')
 def home():
