@@ -262,34 +262,38 @@
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
     const tg = window.Telegram?.WebApp;
-    
-    if (!tg?.initDataUnsafe?.user) {
-        window.location.href = '/queue';
+    if (!tg) {
+        console.error('Not in Telegram WebApp');
         return;
     }
 
     try {
         tg.expand();
         
-        // 1. Авторизация
-        const response = await fetch('/api/auth', {
+        const tgUser = tg.initDataUnsafe?.user;
+        if (!tgUser) {
+            throw new Error('No user data');
+        }
+
+        // Авторизация
+        const authData = {
+            telegram_id: tgUser.id,
+            first_name: tgUser.first_name || '',
+            last_name: tgUser.last_name || '',
+            photo_url: tgUser.photo_url || ''
+        };
+
+        const authResponse = await fetch('/api/auth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                telegram_id: tgUser.id,
-                first_name: tgUser.first_name,
-                last_name: tgUser.last_name || '',
-                username: tgUser.username || '',
-                photo_url: tgUser.photo_url || ''
-            })
+            body: JSON.stringify(authData)
         });
 
         if (!authResponse.ok) {
             throw new Error('Auth failed');
         }
-
         // 2. Загрузка профиля
         const profileResponse = await fetch(`/api/user/${tg.initDataUnsafe.user.id}`);
         if (!profileResponse.ok) {
@@ -343,6 +347,7 @@ function renderProfile(data) {
         gamesList.innerHTML = '<p>Нет данных о последних играх</p>';
     }
 }
+
 </script>
 </body>
 </html>
