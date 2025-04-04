@@ -160,6 +160,14 @@ def serve_css(filename):
 def serve_js(filename):
     return send_from_directory('static/js', filename)
 
+@app.route("/profile")
+def profile():
+    return render_template("profile.html")
+
+@app.route("/queue")
+def queue():
+    return render_template("queue.html")
+
 @app.route('/scripts/<path:filename>')
 def serve_scripts(filename):
     return send_from_directory('static/scripts', filename)
