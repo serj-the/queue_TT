@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function loadAndRenderProfile(telegramId) {
+    async function loadAndRenderProfile(335261856) {
         try {
             showLoader();
 
