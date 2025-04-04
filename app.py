@@ -91,6 +91,19 @@ def get_spots():
 
 @app.route('/api/queue', methods=['GET'])
 def get_queue():
+
+    telegram_id = request.args.get('telegram_id') 
+    app.logger.debug(f"Received telegram_id: {telegram_id}")
+
+    if not telegram_id:
+        return jsonify({"error": "telegram_id is required"}), 400
+
+    user = User.query.filter_by(telegram_id=telegram_id).first()
+    if not user:
+        app.logger.error(f"User with telegram_id {telegram_id} not found")
+        return jsonify({"error": "User not found"}), 404
+    
+    
     spot_id = request.args.get('spot_id')
     if not spot_id:
         return jsonify({'error': 'spot_id is required'}), 400
