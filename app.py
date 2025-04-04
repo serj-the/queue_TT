@@ -27,7 +27,6 @@ def auth_user():
 
         telegram_id = str(data['telegram_id'])
 
-        # Безопасно подставляем значения или пустые строки
         user_data = {
             'telegram_id': telegram_id,
             'nickname': data.get('nickname') or f"User-{telegram_id[-4:]}",
@@ -37,7 +36,6 @@ def auth_user():
             'last_active': datetime.now().isoformat()
         }
 
-        # НЕ удаляем ключи с пустыми строками — они нужны для вызова RPC
         response = supabase.rpc('upsert_user', {
             'p_telegram_id': user_data['telegram_id'],
             'p_nickname': user_data['nickname'],
@@ -98,7 +96,6 @@ def get_queue():
         return jsonify({'error': 'spot_id is required'}), 400
 
     try:
-        # Получаем всех "ожидающих" пользователей на конкретной площадке
         queue_result = supabase.from_('queue') \
             .select('*') \
             .eq('spot_id', spot_id) \
@@ -108,7 +105,6 @@ def get_queue():
 
         queue_data = queue_result.data or []
 
-        # По user_id тянем данные юзеров отдельно
         user_ids = [item['user_id'] for item in queue_data]
         users_result = supabase.from_('users') \
             .select('telegram_id, nickname, photo_url') \
@@ -116,7 +112,6 @@ def get_queue():
             .execute()
         users_data = {user['telegram_id']: user for user in (users_result.data or [])}
 
-        # Склеиваем данные
         response = []
         for item in queue_data:
             user_info = users_data.get(item['user_id'], {})
@@ -148,16 +143,15 @@ def join_queue():
         if existing.data:
             return jsonify({'error': 'User already in queue'}), 400
 
-try:
-    result = supabase.from_('queue') \
-        .select('*') \
-        .eq('spot_id', spot_id) \
-        .eq('status', 'waiting') \
-        .order('joined_at') \
-        .execute()
-except Exception as e:
-    print('Error loading queue:', e)
-    return jsonify({'error': str(e)}), 500
+        result = supabase.from_('queue').insert({
+            'spot_id': data['spot_id'],
+            'user_id': data['user_id'],
+            'status': 'waiting',
+            'joined_at': datetime.now().isoformat(),
+            'comment': data.get('comment', '')
+        }).execute()
+
+        return jsonify(result.data[0] if result.data else {'status': 'joined'})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
