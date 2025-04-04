@@ -148,14 +148,16 @@ def join_queue():
         if existing.data:
             return jsonify({'error': 'User already in queue'}), 400
 
-result = supabase.from_('queue') \
-    .select('*') \
-    .eq('spot_id', spot_id) \
-    .eq('status', 'waiting') \
-    .order('joined_at') \
-    .execute()
-
-        return jsonify(result.data[0])
+try:
+    result = supabase.from_('queue') \
+        .select('*') \
+        .eq('spot_id', spot_id) \
+        .eq('status', 'waiting') \
+        .order('joined_at') \
+        .execute()
+except Exception as e:
+    print('Error loading queue:', e)
+    return jsonify({'error': str(e)}), 500
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
