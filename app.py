@@ -182,6 +182,29 @@ def leave_queue():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/profile', methods=['GET'])
+def get_profile():
+    telegram_id = request.args.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id is required'}), 400
+
+    try:
+        result = supabase.from_('users') \
+            .select('telegram_id, nickname, rating, matches_played, wins, photo_url, first_name, last_name') \
+            .eq('telegram_id', telegram_id) \
+            .single() \
+            .execute()
+
+        user = result.data
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        return jsonify(user)
+
+    except Exception as e:
+        print('Profile error:', e)
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/')
 def home():
     return send_from_directory('static', 'queue.html')
