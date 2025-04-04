@@ -92,17 +92,15 @@
         }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/js/auth.js"></script>
-<script>
+</head>
+<body>
+    <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const user = JSON.parse(localStorage.getItem('current_user'));
         if (!user) {
         }
     });
 </script>
-    <script src="/js/queue.js"></script>
-</head>
-<body>
     <div class="container">
         <h1>Очередь</h1>
         <div id="spot-selector" class="spot-selector">
