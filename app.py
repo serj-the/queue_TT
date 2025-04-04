@@ -30,80 +30,103 @@ def auth_user():
         if not data or 'telegram_id' not in data:
             return jsonify({'error': 'Invalid request data'}), 400
 
-        # Проверяем подпись Telegram (должна быть реализована)
-        # if not verify_telegram_auth(data):
-        #     return jsonify({'error': 'Invalid Telegram auth'}), 401
+        telegram_id = str(data['telegram_id'])  # Преобразуем в строку
+        
+        # Проверяем существование пользователя
+        existing = supabase.table('users') \
+            .select('*') \
+            .eq('telegram_id', telegram_id) \
+            .maybe_single() \
+            .execute()
 
-        user_data = {
-            'telegram_id': data['telegram_id'],
+        update_data = {
+            'last_active': datetime.now().isoformat(),
+            'nickname': data.get('nickname') or data.get('first_name', '') + ' ' + data.get('last_name', ''),
             'first_name': data.get('first_name', ''),
             'last_name': data.get('last_name', ''),
             'username': data.get('username', ''),
-            'photo_url': data.get('photo_url', ''),
-            'nickname': data.get('first_name', 'Игрок'),
-            'last_active': datetime.now().isoformat()
+            'photo_url': data.get('photo_url', '')
         }
 
-        # Проверяем существование пользователя
-        existing_user = supabase.table('users') \
-            .select('*') \
-            .eq('telegram_id', user_data['telegram_id']) \
-            .execute()
+        # Удаляем None значения
+        update_data = {k: v for k, v in update_data.items() if v is not None}
 
-        if existing_user.data:
+        if existing.data:
             # Обновляем существующего пользователя
             result = supabase.table('users') \
-                .update(user_data) \
-                .eq('telegram_id', user_data['telegram_id']) \
+                .update(update_data) \
+                .eq('telegram_id', telegram_id) \
                 .execute()
         else:
-            # Создаем нового пользователя с дефолтными значениями
-            user_data.update({
+            # Создаем нового пользователя
+            new_user = {
+                'telegram_id': telegram_id,
                 'rating': 1000,
                 'matches_played': 0,
                 'wins': 0,
-                'created_at': datetime.now().isoformat()
-            })
+                'created_at': datetime.now().isoformat(),
+                **update_data
+            }
             result = supabase.table('users') \
-                .insert(user_data) \
+                .insert(new_user) \
                 .execute()
 
-        return jsonify(result.data[0])
+        return jsonify(result.data[0] if result.data else {'status': 'created'})
+        
     except Exception as e:
+        print(f"Auth error: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
+        
 @app.route('/api/user/<telegram_id>')
 def get_user(telegram_id: str):
     try:
-        # Получаем основную информацию о пользователе
+        # 1. Проверяем существование пользователя
         user_result = supabase.table('users') \
             .select('*') \
-            .eq('telegram_id', telegram_id) \
-            .single() \
+            .eq('telegram_id', str(telegram_id)) \  # Явное преобразование в строку
+            .maybe_single() \  # Используем maybe_single вместо single
             .execute()
 
-        # Получаем последние игры пользователя
-        games_result = supabase.table('games') \
-            .select('*, opponent:opponent_id(nickname, photo_url)') \
-            .or_(f'player1_id.eq.{telegram_id},player2_id.eq.{telegram_id}') \
-            .order('played_at', desc=True) \
-            .limit(5) \
-            .execute()
+        if not user_result.data:
+            return jsonify({
+                'error': 'User not found',
+                'telegram_id': telegram_id,
+                'exists': False
+            }), 404
+
+        # 2. Получаем игры только если пользователь существует
+        try:
+            games_result = supabase.table('games') \
+                .select('*, opponent:opponent_id(nickname, photo_url)') \
+                .or_(f'player1_id.eq.{telegram_id},player2_id.eq.{telegram_id}') \
+                .order('played_at', desc=True) \
+                .limit(5) \
+                .execute()
+            
+            last_games = [{
+                'opponent': game['opponent']['nickname'] if game.get('opponent') else 'Unknown',
+                'result': f"{game.get('player1_score', 0)}:{game.get('player2_score', 0)}",
+                'date': game['played_at'].split('T')[0] if 'played_at' in game else 'N/A',
+                'is_win': (game.get('player1_id') == telegram_id and game.get('player1_score', 0) > game.get('player2_score', 0)) or 
+                         (game.get('player2_id') == telegram_id and game.get('player2_score', 0) > game.get('player1_score', 0))
+            } for game in games_result.data]
+        except Exception as games_error:
+            print(f"Games query error: {games_error}")
+            last_games = []
 
         user_data = user_result.data
-        # Заменяем JavaScript-синтаксис на Python
-        user_data['last_games'] = [{
-            'opponent': game['opponent']['nickname'] if game.get('opponent') else 'Unknown',
-            'result': f"{game['player1_score']}:{game['player2_score']}",
-            'date': game['played_at'].split('T')[0],
-            'is_win': (game['player1_id'] == telegram_id and game['player1_score'] > game['player2_score']) or 
-                     (game['player2_id'] == telegram_id and game['player2_score'] > game['player1_score'])
-        } for game in games_result.data]
-
+        user_data['last_games'] = last_games
+        user_data['exists'] = True
+        
         return jsonify(user_data)
+        
     except Exception as e:
         print(f"Error fetching user: {str(e)}")
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({
+            'error': 'Database error',
+            'details': str(e),
+            'telegram_id': telegram_id
+        }), 500
 
 @app.route('/api/queue', methods=['GET'])
 def get_queue():
