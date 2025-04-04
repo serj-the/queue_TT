@@ -23,16 +23,16 @@ def auth_user():
     try:
         data = request.json
         if not data or 'telegram_id' not in data:
-            return jsonify({'error': 'Telegram ID is required'}), 400
+            return jsonify({'error': 'Invalid request data'}), 400
 
         telegram_id = str(data['telegram_id'])
         
         existing = supabase.table('users') \
-            .select('*') \
+            .select('id') \
             .eq('telegram_id', telegram_id) \
             .execute()
 
-        update_data = {
+        user_data = {
             'nickname': data.get('nickname') or f"{data.get('first_name', '')} {data.get('last_name', '')}".strip(),
             'photo_url': data.get('photo_url'),
             'last_active': datetime.now().isoformat()
@@ -40,7 +40,7 @@ def auth_user():
 
         if existing.data:
             result = supabase.table('users') \
-                .update(update_data) \
+                .update(user_data) \
                 .eq('telegram_id', telegram_id) \
                 .execute()
         else:
@@ -48,7 +48,8 @@ def auth_user():
                 'telegram_id': telegram_id,
                 'rating': 1000,
                 'matches_played': 0,
-                **update_data
+                'wins': 0,
+                **user_data
             }
             result = supabase.table('users') \
                 .insert(new_user) \
@@ -57,7 +58,8 @@ def auth_user():
         return jsonify(result.data[0] if result.data else {'status': 'created'})
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Auth error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/user/<telegram_id>')
 def get_user(telegram_id):
