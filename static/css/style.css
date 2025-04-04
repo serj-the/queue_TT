@@ -28,52 +28,50 @@ body {
 
 /* Стили нижней панели */
 .tabs {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-  background-color: var(--card-bg);
-  padding: 12px 0;
-  box-shadow: var(--box-shadow);
-  z-index: 1000;
+    position: fixed;
+    bottom: 10px; /* Отступ от нижнего края */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px); /* Ширина с отступами по бокам */
+    max-width: 400px; /* Максимальная ширина */
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    background: var(--tg-theme-bg-color);
+    border-radius: 30px; /* Закругление как у капсулы */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Тень для "плавающего" эффекта */
+    z-index: 100;
+    padding: 10px 0;
+    margin: 0 auto;
+    border: 1px solid var(--tg-theme-secondary-bg-color); /* Граница для контраста */
 }
 
-.tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #666;
-  font-size: 12px;
-  flex: 1;
-  max-width: 120px;
-  padding: 8px 0;
-  transition: all 0.2s;
-}
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--tg-theme-hint-color);
+            flex: 1;
+            height: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            color: var(--tg-theme-button-color);
+            transform: translateY(-5px);
+        }
 
-.tab.active {
-  color: var(--primary-color);
-  transform: translateY(-2px);
-}
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+        }
 
-.tab-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
-  fill: currentColor;
-}
+        .tab span {
+            font-size: 12px;
+            font-weight: 500;
+        }
 
-/* Адаптация под темную тему Telegram */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #1e1e1e;
-    --text-color: #ffffff;
-    --card-bg: #2d2d2d;
-  }
-  
-  .tab {
-    color: #aaa;
-  }
 }
