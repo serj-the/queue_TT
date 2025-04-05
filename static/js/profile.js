@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const telegramId = String(user.id);
 
     try {
-        const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
+        const response = await fetch(`/api/user?telegram_id=eq."${telegramId}"`);
         const users = await response.json();
 
         if (!Array.isArray(users) || users.length === 0) {
