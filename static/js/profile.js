@@ -25,30 +25,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAndRenderProfile(telegramId) {
     showLoader();
+    
+async function loadAndRenderProfile(telegramId) {
+    showLoader();
 
     try {
-        const res = await fetch('/api/user');
-        const users = await res.json();
+        const res = await fetch(`/api/user/${telegramId}`);
+        const profile = await res.json();
 
-        console.log('👥 Users:', users);
-
-        const profile = users.find(u => String(u.telegram_id) === String(telegramId));
+        console.log('👤 Profile:', profile);
 
         if (!profile) throw new Error('User not found');
-
-        // Заглушка статистики
-        profile.rating = 1000 + Math.floor(Math.random() * 500);
-        profile.matches_played = Math.floor(Math.random() * 10) + 1;
-        profile.wins = Math.floor(Math.random() * profile.matches_played);
-        profile.last_games = [
-            { opponent: 'Игрок 1', result: '2:1', is_win: true, date: 'Сегодня' },
-            { opponent: 'Игрок 2', result: '1:2', is_win: false, date: 'Вчера' },
-        ];
 
         renderProfile(profile);
     } catch (err) {
         console.error('💥 Ошибка загрузки данных:', err);
-        showError(`❌ Не удалось загрузить профиль: ${err.message}`);
+        showError(`Не удалось загрузить профиль: ${err.message}`);
     }
 }
 
