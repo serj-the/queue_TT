@@ -16,7 +16,9 @@ def upsert_user():
         if not user_data or 'telegram_id' not in user_data:
             return jsonify({'error': 'Telegram ID is required'}), 400
 
-        # Структура данных пользователя
+        # Логируем входящие данные
+        app.logger.info(f"Received user data: {user_data}")
+        
         telegram_id = str(user_data['telegram_id'])
         nickname = user_data.get('nickname', '')
         photo_url = user_data.get('photo_url', '')
@@ -30,11 +32,13 @@ def upsert_user():
         }).execute()
 
         if response.error:
+            app.logger.error(f"Supabase error: {response.error}")
             return jsonify({'error': response.error}), 500
         
         return jsonify(response.data[0] if response.data else {'status': 'created'})
 
     except Exception as e:
+        app.logger.error(f"Exception occurred: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.after_request
