@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', initApp);
             `<option value="${spot.id}">${spot.name}</option>`
         ).join('');
         
-        // Инициализация очереди
         await updateQueue();
     } catch (error) {
         console.error('Ошибка загрузки:', error);
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', initApp);
     // Обновление очереди
     async function updateQueue() {
         const spotId = document.getElementById('spot-select').value;
-        const queueResponse = await fetch(`/api/queue?spot_id=${spotId}`);
+        const queueResponse = await fetch(`/api/queue?spot_id=${spotId}&telegram_id=${telegramId}`);
         const queue = await queueResponse.json();
         if (!Array.isArray(queue)) {
   console.error('Не массив:', queue);
