@@ -76,7 +76,10 @@ document.addEventListener('DOMContentLoaded', initApp);
         const spotId = document.getElementById('spot-select').value;
         const queueResponse = await fetch(`/api/queue?spot_id=${spotId}`);
         const queue = await queueResponse.json();
-        
+        if (!Array.isArray(queue)) {
+  console.error('Не массив:', queue);
+  return;
+}
         document.getElementById('queue-container').innerHTML = queue.map(item => `
             <div class="queue-item">
                 <div class="user">${item.user.nickname}</div>
