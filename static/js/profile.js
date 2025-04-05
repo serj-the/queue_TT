@@ -5,7 +5,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const telegramId = String(tg.initDataUnsafe.user.id);
+    tg.expand();
+
+    const user = tg.initDataUnsafe.user;
+    console.log('TG user:', user);
+
+    if (!user?.id) {
+        console.error('Не получен telegram_id');
+        return;
+    }
+
+    const telegramId = String(user.id);
 
     try {
         const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
@@ -57,9 +67,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
 
     } catch (error) {
-        console.error(error);
+        console.error('Ошибка при загрузке профиля:', error);
         document.querySelector('.profile-container').innerHTML = `
-            <p style="text-align:center;">❌ ${error.message}</p>
+            <p style="text-align:center;">❌ Не удалось загрузить профиль: ${error.message}</p>
         `;
     }
 });
