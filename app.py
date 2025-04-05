@@ -53,6 +53,8 @@ def auth_user():
 @app.route('/api/user/<telegram_id>')
 def get_user(telegram_id):
     try:
+        telegram_id = str(telegram_id)
+        app.logger.info(f"Fetching user with telegram_id: {telegram_id}")
         user_result = supabase.from_('users').select('*').eq('telegram_id', telegram_id).execute()
 
         if not user_result.data:
