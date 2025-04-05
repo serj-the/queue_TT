@@ -1,26 +1,29 @@
 document.addEventListener('DOMContentLoaded', async () => {
-        console.log('🔥 DOM Loaded');
-const tg = window.Telegram?.WebApp;
-if (!tg?.initDataUnsafe?.user) {
-    console.warn('❌ Telegram WebApp не найден или нет user');
-    showError('Приложение доступно только в Telegram');
-    return;
-}
+    console.log('🔥 DOM Loaded');
 
-console.log('✅ Telegram user:', tg.initDataUnsafe.user);
-    tg.expand();
+    try {
+        const tg = window.Telegram?.WebApp;
 
-    const user = tg.initDataUnsafe.user;
-    console.log('TG user:', user);
+        if (!tg?.initDataUnsafe?.user) {
+            console.warn('❌ Telegram WebApp не найден или нет user');
+            showError('Приложение доступно только в Telegram');
+            return;
+        }
 
-    if (!user?.id) {
-        console.error('Не получен telegram_id');
-        return;
+        tg.expand();
+        const user = tg.initDataUnsafe.user;
+        console.log('✅ Telegram user:', user);
+
+        const telegramId = user.id;
+
+        await loadAndRenderProfile(telegramId);
+    } catch (error) {
+        console.error('💥 Ошибка при загрузке профиля:', error);
+        showError(`❌ Не удалось загрузить профиль: ${error.message}`);
     }
+});
 
-    const telegramId = '335261856';
-
-    async function loadAndRenderProfile(telegramId) {
+async function loadAndRenderProfile(telegramId) {
     showLoader();
 
     try {
@@ -33,8 +36,9 @@ console.log('✅ Telegram user:', tg.initDataUnsafe.user);
 
         if (!profile) throw new Error('User not found');
 
-        // Заглушка случайных данных
-        profile.matches_played = Math.floor(Math.random() * 10);
+        // Заглушка статистики
+        profile.rating = 1000 + Math.floor(Math.random() * 500);
+        profile.matches_played = Math.floor(Math.random() * 10) + 1;
         profile.wins = Math.floor(Math.random() * profile.matches_played);
         profile.last_games = [
             { opponent: 'Игрок 1', result: '2:1', is_win: true, date: 'Сегодня' },
@@ -43,47 +47,46 @@ console.log('✅ Telegram user:', tg.initDataUnsafe.user);
 
         renderProfile(profile);
     } catch (err) {
-        console.error('💥 Ошибка профиля:', err);
-        showError(`Не удалось загрузить профиль: ${err.message}`);
+        console.error('💥 Ошибка загрузки данных:', err);
+        showError(`❌ Не удалось загрузить профиль: ${err.message}`);
     }
 }
 
-        // Имя
-        const profileName = document.querySelector('.profile-info h2');
-        profileName.textContent = user.nickname || `${user.first_name} ${user.last_name}` || 'Игрок';
+function renderProfile(profile) {
+    const profileName = document.querySelector('.profile-info h2');
+    profileName.textContent = profile.username || profile.name || 'Игрок';
 
-        // Рейтинг и победы
-        const rating = user.rating || 1000;
-        const matches = Math.floor(Math.random() * 20) + 1;
-        const wins = Math.floor(Math.random() * (matches + 1));
-        const loses = matches - wins;
-        const winPercent = matches > 0 ? Math.round((wins / matches) * 100) : 0;
+    const rating = profile.rating;
+    const matches = profile.matches_played;
+    const wins = profile.wins;
+    const loses = matches - wins;
+    const winPercent = matches > 0 ? Math.round((wins / matches) * 100) : 0;
 
-        document.querySelector('.rating-value').textContent = rating;
-        document.querySelector('.rank').textContent = `(${winPercent}% побед)`;
+    document.querySelector('.rating-value').textContent = rating;
+    document.querySelector('.rank').textContent = `(${winPercent}% побед)`;
 
-        // Статистика
-        document.querySelector('.stat-value.matches').textContent = matches;
-        document.querySelector('.stat-value.wins').textContent = wins;
-        document.querySelector('.stat-value.loses').textContent = loses;
+    document.querySelector('.stat-value.matches').textContent = matches;
+    document.querySelector('.stat-value.wins').textContent = wins;
+    document.querySelector('.stat-value.loses').textContent = loses;
 
-        // Последние игры (рандом-заглушка)
-        const gamesList = document.querySelector('.games-list');
-        gamesList.innerHTML = Array.from({ length: 3 }).map(() => {
-            const isWin = Math.random() > 0.5;
-            return `
-                <div class="game-item">
-                    <span class="opponent">Соперник</span>
-                    <span class="result ${isWin ? 'win' : 'lose'}">${isWin ? '2:1' : '0:2'}</span>
-                    <span class="game-date">Сегодня</span>
-                </div>
-            `;
-        }).join('');
+    const gamesList = document.querySelector('.games-list');
+    gamesList.innerHTML = profile.last_games.map(game => `
+        <div class="game-item">
+            <span class="opponent">${game.opponent}</span>
+            <span class="result ${game.is_win ? 'win' : 'lose'}">${game.result}</span>
+            <span class="game-date">${game.date}</span>
+        </div>
+    `).join('');
+}
 
-    } catch (error) {
-        console.error('Ошибка при загрузке профиля:', error);
-        document.querySelector('.profile-container').innerHTML = `
-            <p style="text-align:center;">❌ Не удалось загрузить профиль: ${error.message}</p>
-        `;
-    }
-});
+function showLoader() {
+    const gamesList = document.querySelector('.games-list');
+    gamesList.innerHTML = `<p>Загрузка...</p>`;
+}
+
+function showError(message) {
+    const container = document.querySelector('.profile-container');
+    container.innerHTML = `
+        <p style="text-align:center; padding: 1em;">${message}</p>
+    `;
+}
