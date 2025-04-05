@@ -1,136 +1,65 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    
-async function initApp() {
     const tg = window.Telegram?.WebApp;
     if (!tg?.initDataUnsafe?.user) {
-        console.error('Not in Telegram WebApp');
+        alert('Открывай через Telegram 😢');
         return;
     }
 
+    const telegramId = String(tg.initDataUnsafe.user.id);
+
     try {
-        tg.expand();
-        const tgUser = tg.initDataUnsafe.user;
-        
-        const authResponse = await fetch('/api/auth', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telegram_id: tgUser.id,
-                first_name: tgUser.first_name,
-                last_name: tgUser.last_name || '',
-                photo_url: tgUser.photo_url || ''
-            })
-        });
+        const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
+        const users = await response.json();
 
-        if (!authResponse.ok) {
-            throw new Error('Auth failed');
+        if (!Array.isArray(users) || users.length === 0) {
+            throw new Error('Пользователь не найден');
         }
 
-        console.log('User authenticated successfully');
-        
-    } catch (error) {
-        console.error('Initialization error:', error);
-    }
-}
+        const user = users[0];
 
-document.addEventListener('DOMContentLoaded', initApp);
-
-    
-        try {
-            const response = await fetch(`/api/user?telegram_id=eq.${telegramId}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const users = await response.json();
-
-            if (!Array.isArray(users) || users.length === 0) {
-                throw new Error('User not found');
-            }
-
-            const profileData = users[0];
-
-            // Рендерим профиль
-            renderProfile(profileData);
-        } catch (error) {
-            console.error('Profile load error:', error);
-            showError(`Не удалось загрузить профиль: ${error.message}`);
-        }
-
-    function renderProfile(data) {
-        if (!data) {
-            throw new Error('No data provided');
-        }
-
+        // Фото
         const profilePhoto = document.querySelector('.profile-photo');
+        profilePhoto.src = user.photo_url || 'https://via.placeholder.com/150';
+        profilePhoto.onerror = () => {
+            profilePhoto.src = 'https://via.placeholder.com/150';
+        };
+
+        // Имя
         const profileName = document.querySelector('.profile-info h2');
-        
-        profilePhoto.src = data.photo_url || null;
-        profilePhoto.onerror = () => { profilePhoto.src = null; };
-        
-        profileName.textContent = data.nickname || 
-                               [data.first_name, data.last_name].filter(Boolean).join(' ').trim() || 
-                               'Игрок';
+        profileName.textContent = user.nickname || `${user.first_name} ${user.last_name}` || 'Игрок';
+
+        // Рейтинг и победы
+        const rating = user.rating || 1000;
+        const matches = Math.floor(Math.random() * 20) + 1;
+        const wins = Math.floor(Math.random() * (matches + 1));
+        const loses = matches - wins;
+        const winPercent = matches > 0 ? Math.round((wins / matches) * 100) : 0;
+
+        document.querySelector('.rating-value').textContent = rating;
+        document.querySelector('.rank').textContent = `(${winPercent}% побед)`;
 
         // Статистика
-        const matches = data.matches_played || 0;
-        const wins = data.wins || 0;
-        const loses = matches - wins;
-        const winPercentage = matches > 0 ? Math.round((wins / matches) * 100) : 0;
-
-        document.querySelector('.rating-badge').innerHTML = `
-            ⭐ ${data.rating || 1000} 
-            <span class="rank">(${winPercentage}% побед)</span>
-        `;
-        
         document.querySelector('.stat-value.matches').textContent = matches;
         document.querySelector('.stat-value.wins').textContent = wins;
         document.querySelector('.stat-value.loses').textContent = loses;
 
-        // Последние игры
-        renderGames(data.last_games || []);
-    }
-
-    function renderGames(games) {
+        // Последние игры (рандом-заглушка)
         const gamesList = document.querySelector('.games-list');
-        
-        if (!games || games.length === 0) {
-            gamesList.innerHTML = '<p>Нет данных о последних играх</p>';
-            return;
-        }
+        gamesList.innerHTML = Array.from({ length: 3 }).map(() => {
+            const isWin = Math.random() > 0.5;
+            return `
+                <div class="game-item">
+                    <span class="opponent">Соперник</span>
+                    <span class="result ${isWin ? 'win' : 'lose'}">${isWin ? '2:1' : '0:2'}</span>
+                    <span class="game-date">Сегодня</span>
+                </div>
+            `;
+        }).join('');
 
-        gamesList.innerHTML = games.map(game => `
-            <div class="game-item">
-                <span class="opponent">${game.opponent || 'Unknown'}</span>
-                <span class="result ${game.is_win ? 'win' : 'lose'}">
-                    ${game.result || '0:0'}
-                </span>
-                <span class="game-date">${game.date || 'N/A'}</span>
-            </div>
-        `).join('');
-    }
-
-    function showLoader() {
+    } catch (error) {
+        console.error(error);
         document.querySelector('.profile-container').innerHTML = `
-            <div class="loader">
-                <p>Загрузка профиля...</p>
-            </div>
+            <p style="text-align:center;">❌ ${error.message}</p>
         `;
     }
-
-    function showError(message) {
-        document.querySelector('.profile-container').innerHTML = `
-            <div class="error-message">
-                <p>${message}</p>
-                <button class="tg-button" onclick="window.location.href='/queue'">
-                    Вернуться в очередь
-                </button>
-            </div>
-        `;
-    }
-
-    // Инициализация
-   await initApp();
 });
