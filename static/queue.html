@@ -113,8 +113,15 @@
             <!-- Очередь будет здесь -->
         </div>
         
-        <textarea id="comment-input" placeholder="Ваш комментарий (необязательно)" class="comment-input"></textarea>
-        <button id="join-button" class="primary-button">Встать в очередь</button>
+<textarea id="comment-input" placeholder="Ваш комментарий" class="comment-input"></textarea>
+<input type="number" id="number-input" placeholder="Номер" class="number-input">
+<button id="get-comment-button" class="primary-button">Получить последний комментарий</button>
+<button id="send-comment-button" class="primary-button">Отправить комментарий</button>
+
+<div id="last-comment-container">
+    <p>Последний комментарий:</p>
+    <p id="last-comment">Здесь будет последний комментарий.</p>
+</div>
     </div>
 
     <div class="tabs">
