@@ -1,10 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg?.initDataUnsafe?.user) {
-        alert('Открывай через Telegram 😢');
-        return;
-    }
+        console.log('🔥 DOM Loaded');
+const tg = window.Telegram?.WebApp;
+if (!tg?.initDataUnsafe?.user) {
+    console.warn('❌ Telegram WebApp не найден или нет user');
+    showError('Приложение доступно только в Telegram');
+    return;
+}
 
+console.log('✅ Telegram user:', tg.initDataUnsafe.user);
     tg.expand();
 
     const user = tg.initDataUnsafe.user;
@@ -15,29 +18,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const telegramId = String(user.id);
+    const telegramId = '335261856';
 
-async function loadAndRenderProfile(telegramId) {
+    async function loadAndRenderProfile(telegramId) {
+    showLoader();
+
     try {
-        showLoader();
+        const res = await fetch('/api/user');
+        const users = await res.json();
 
-        const response = await fetch(`/api/user`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        console.log('👥 Users:', users);
 
-        const users = await response.json();
+        const profile = users.find(u => String(u.telegram_id) === String(telegramId));
 
-        const profileData = users.find(user => String(user.telegram_id) === String(telegramId));
+        if (!profile) throw new Error('User not found');
 
-        if (!profileData) {
-            throw new Error('User not found');
-        }
+        // Заглушка случайных данных
+        profile.matches_played = Math.floor(Math.random() * 10);
+        profile.wins = Math.floor(Math.random() * profile.matches_played);
+        profile.last_games = [
+            { opponent: 'Игрок 1', result: '2:1', is_win: true, date: 'Сегодня' },
+            { opponent: 'Игрок 2', result: '1:2', is_win: false, date: 'Вчера' },
+        ];
 
-        renderProfile(profileData);
-    } catch (error) {
-        console.error('Profile load error:', error);
-        showError(`Не удалось загрузить профиль: ${error.message}`);
+        renderProfile(profile);
+    } catch (err) {
+        console.error('💥 Ошибка профиля:', err);
+        showError(`Не удалось загрузить профиль: ${err.message}`);
     }
 }
 
