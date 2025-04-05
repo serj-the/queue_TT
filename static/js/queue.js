@@ -34,7 +34,4 @@ async function initApp() {
         console.error('Initialization error:', error);
     }
 }
-
-document.addEventListener('DOMContentLoaded', initApp);
-
 });
