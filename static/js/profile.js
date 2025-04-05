@@ -17,22 +17,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const telegramId = String(user.id);
 
+async function loadAndRenderProfile(telegramId) {
     try {
-        const response = await fetch(`/api/user?telegram_id=eq."${telegramId}"`);
-        const users = await response.json();
+        showLoader();
 
-        if (!Array.isArray(users) || users.length === 0) {
-            throw new Error('Пользователь не найден');
+        const response = await fetch(`/api/user`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const user = users[0];
+        const users = await response.json();
 
-        // Фото
-        const profilePhoto = document.querySelector('.profile-photo');
-        profilePhoto.src = user.photo_url || 'https://via.placeholder.com/150';
-        profilePhoto.onerror = () => {
-            profilePhoto.src = 'https://via.placeholder.com/150';
-        };
+        const profileData = users.find(user => String(user.telegram_id) === String(telegramId));
+
+        if (!profileData) {
+            throw new Error('User not found');
+        }
+
+        renderProfile(profileData);
+    } catch (error) {
+        console.error('Profile load error:', error);
+        showError(`Не удалось загрузить профиль: ${error.message}`);
+    }
+}
 
         // Имя
         const profileName = document.querySelector('.profile-info h2');
