@@ -92,7 +92,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
     }
-
-    // Инициализация
-   await initApp();
 });
