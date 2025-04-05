@@ -53,24 +53,52 @@ document.addEventListener('DOMContentLoaded', initApp);
         console.error('Ошибка загрузки:', error);
     }
     
-    // Обработчик кнопки
-    document.getElementById('join-button').addEventListener('click', async () => {
-        const spotId = document.getElementById('spot-select').value;
-        const comment = document.getElementById('comment-input').value;
-        
-        await fetch('/api/queue/join', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                spot_id: spotId,
-                user_id: user.id,
-                comment: comment
-            })
-        });
-        
-        await updateQueue();
+document.addEventListener('DOMContentLoaded', () => {
+    const getCommentButton = document.getElementById('get-comment-button');
+    const sendCommentButton = document.getElementById('send-comment-button');
+    const lastCommentContainer = document.getElementById('last-comment');
+    const commentInput = document.getElementById('comment-input');
+    const numberInput = document.getElementById('number-input');
+
+    // Получить последний комментарий
+    getCommentButton.addEventListener('click', async () => {
+        const response = await fetch('/api/comments');
+        const data = await response.json();
+        if (data.comment) {
+            lastCommentContainer.textContent = data.comment;
+        } else {
+            lastCommentContainer.textContent = 'Комментариев нет.';
+        }
     });
-    
+
+    // Отправить новый комментарий
+    sendCommentButton.addEventListener('click', async () => {
+        const comment = commentInput.value;
+        const number = numberInput.value;
+
+        if (!comment || !number) {
+            alert('Заполните все поля!');
+            return;
+        }
+
+        const response = await fetch('/api/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ comment, number }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert('Комментарий успешно добавлен!');
+            commentInput.value = '';
+            numberInput.value = '';
+        } else {
+            alert('Ошибка при добавлении комментария');
+        }
+    });
+});
     // Обновление очереди
     async function updateQueue() {
         const spotId = document.getElementById('spot-select').value;
