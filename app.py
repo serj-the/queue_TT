@@ -10,6 +10,33 @@ supabase = create_client(
     os.getenv('SUPABASE_KEY')
 )
 
+@app.route('/api/comments', methods=['GET'])
+def get_last_comment():
+    try:
+        # Запрашиваем последний комментарий из таблицы
+        result = supabase.from_('comments').select('*').order('created_at', desc=True).limit(1).execute()
+        return jsonify(result.data[0] if result.data else {'message': 'No comments found'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/comments', methods=['POST'])
+def add_comment():
+    data = request.json
+    if 'number' not in data or 'comment' not in data:
+        return jsonify({'error': 'Number and comment are required'}), 400
+    
+    try:
+        # Вставляем новый комментарий в таблицу
+        result = supabase.from_('comments').insert({
+            'number': data['number'],
+            'comment': data['comment']
+        }).execute()
+        
+        return jsonify({'success': True, 'data': result.data}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.after_request
 def add_cors_headers(response):
     if request.path.startswith('/api'):
