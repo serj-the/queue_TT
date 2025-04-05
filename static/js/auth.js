@@ -13,7 +13,7 @@ async function initTelegramUser() {
 
     try {
         // Сохраняем/обновляем пользователя в БД
-        const response = await fetch('/api/users/upsert', {
+        const response = await fetch('/api/user/upsert', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
