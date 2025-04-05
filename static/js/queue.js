@@ -9,19 +9,27 @@ async function initApp() {
 
     try {
         tg.expand();
-        const tgUser = tg.initDataUnsafe.user;
         
+        const tgUser = tg.initDataUnsafe?.user;
+        if (!tgUser) {
+            throw new Error('No user data');
+        }
+
+        // Данные для аутентификации
+        const authData = {
+            telegram_id: tgUser.id,
+            first_name: tgUser.first_name || '',
+            last_name: tgUser.last_name || '',
+            nickname: tgUser.username || '',
+            photo_url: tgUser.photo_url || ''
+        };
+
         const authResponse = await fetch('/api/auth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                telegram_id: tgUser.id,
-                first_name: tgUser.first_name,
-                last_name: tgUser.last_name || '',
-                photo_url: tgUser.photo_url || ''
-            })
+            body: JSON.stringify(authData)
         });
 
         if (!authResponse.ok) {
