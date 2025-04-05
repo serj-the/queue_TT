@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ Telegram user:', user);
 
         const telegramId = user.id;
+        console.log(`🆔 Telegram ID: ${telegramId}`); // Логируем ID перед отправкой запроса
 
         await loadAndRenderProfile(telegramId);
     } catch (error) {
@@ -25,15 +26,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAndRenderProfile(telegramId) {
     showLoader();
-    
-async function loadAndRenderProfile(telegramId) {
-    showLoader();
 
     try {
+        console.log(`🔍 Загружаем профиль для ID: ${telegramId}`); // Логируем перед запросом
+
         const res = await fetch(`/api/user/${telegramId}`);
+
+        if (!res.ok) {
+            // Обрабатываем ошибку от сервера
+            throw new Error(`Ошибка ${res.status}: ${res.statusText}`);
+        }
+
         const profile = await res.json();
 
-        console.log('👤 Profile:', profile);
+        console.log('👤 Profile:', profile); // Логируем ответ сервера
 
         if (!profile) throw new Error('User not found');
 
